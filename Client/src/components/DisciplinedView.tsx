@@ -691,9 +691,9 @@ export const DisciplinedView: React.FC = () => {
                                                 key={day}
                                                 onClick={() => setSelectedDay(day)}
                                                 className={`
-                                                group relative aspect-square rounded-2xl border flex flex-col items-center justify-center cursor-pointer transition-all duration-300
+                                                group relative aspect-square rounded-2xl border flex flex-col items-center justify-center cursor-pointer transition-all duration-300  h-11
                                                 ${styleClass}
-                                                ${isSelected ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900 scale-105 z-10 shadow-lg shadow-cyan-500/20' : 'opacity-80 hover:opacity-100 hover:scale-105 active:scale-95'}
+                                                ${isSelected ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900 scale-100 z-10 shadow-lg shadow-cyan-500/20' : 'opacity-80 hover:opacity-100 hover:scale-105 active:scale-95'}
                                                 ${isCurrent && !isSelected ? 'ring-1 ring-cyan-500/50' : ''}
                                             `}
                                             >
