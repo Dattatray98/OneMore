@@ -10,6 +10,7 @@ interface TaskModalProps {
     initialData?: Partial<Task>;
     defaultDate?: string;
     defaultTime?: string;
+    restrictToTime?: boolean;
 }
 
 export const TaskModal: React.FC<TaskModalProps> = ({
@@ -18,7 +19,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     onSave,
     initialData,
     defaultDate,
-    defaultTime
+    defaultTime,
+    restrictToTime = false
 }) => {
     const [text, setText] = useState('');
     const [date, setDate] = useState('');
@@ -46,17 +48,17 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-            <div className="w-full max-w-md bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 dark:bg-black/50 backdrop-blur-sm animate-fade-in">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 relative">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                     <X size={20} />
                 </button>
 
-                <h2 className="text-xl font-bold mb-6">
-                    {initialData?.id ? 'Edit Task' : 'New Task'}
+                <h2 className="text-xl font-bold mb-6 text-slate-900 dark:text-white">
+                    {initialData?.id ? (restrictToTime ? 'Update Protocol Time' : 'Edit Task') : 'New Task'}
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,10 +68,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                             type="text"
                             value={text}
                             onChange={(e) => setText(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                            disabled={restrictToTime}
+                            className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-2 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all ${restrictToTime ? 'opacity-50 cursor-not-allowed' : ''}`}
                             placeholder="What needs to be done?"
-                            autoFocus
+                            autoFocus={!restrictToTime}
                         />
+                        {restrictToTime && <p className="text-[10px] text-cyan-400/50 mt-1 font-medium uppercase tracking-tighter">Protocol titles are fixed</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -81,7 +85,8 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all [color-scheme:dark]"
+                                    disabled={restrictToTime}
+                                    className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all dark:scheme-dark ${restrictToTime ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 />
                             </div>
                         </div>
@@ -93,7 +98,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                                     type="time"
                                     value={time}
                                     onChange={(e) => setTime(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all [color-scheme:dark]"
+                                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all dark:scheme-dark"
                                 />
                             </div>
                         </div>
@@ -103,7 +108,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all text-sm font-medium"
+                            className="px-4 py-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-sm font-medium"
                         >
                             Cancel
                         </button>
