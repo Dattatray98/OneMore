@@ -22,17 +22,17 @@ npm run dev
 ```
 The app will be available at `http://localhost:5173`.
 
-## 🗄️ Local Database & Persistence
+## 🗄️ Persistence & Deployment
 
-- **SQLite Backend**: All your tasks, protocols, and stats are stored in `Server/onemore.db`.
-- **Privacy**: The database is created automatically on your first run. Your data stays locally on your system.
-- **Auto-Migration**: If you have older data in your browser's local storage, it will automatically be migrated to the SQLite database on your first visit.
+- **Current Mode**: **Local-Only (localStorage)**. To make deployment as simple as possible (e.g., on Vercel), the app currently stores all data directly in your browser's local storage. No backend database setup is required.
+- **Privacy**: Your data stays 100% on your device.
+- **Future-Proof**: The API layer is already built to support SQLite. To switch back to the database mode, simply revert the `Client/src/api.ts` file to its fetch-based implementation.
 
-## ✨ Key Features
-- **Forge Protocols**: Design multi-day discipline rituals with automated resets.
-- **Deep Work Engine**: Integrated Pomodoro timer with task sequencing.
-- **Focus Analyzer**: Track your evolution with 7-day visualization heatmaps.
-- **Modern UI**: Fully theme-aware (Light/Dark mode) premium experience.
+## 🌐 Quick Deploy (Frontend Only)
+1. Push this code to GitHub.
+2. Connect your repository to **Vercel**.
+3. Set the **Root Directory** to `Client`.
+4. Deploy! No environment variables or databases needed for this mode.
 
 ---
 

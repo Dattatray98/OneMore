@@ -168,11 +168,8 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
 
     const today = new Date();
 
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
     return (
-        <div className={`min-h-screen selection:bg-cyan-500 selection:text-cyan-950 flex font-sans transition-colors duration-300 ${isDark ? 'bg-slate-950 text-white dark' : 'bg-white text-slate-900'
-            }`}>
+        <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white selection:bg-cyan-500 selection:text-cyan-950 flex font-sans transition-colors duration-300">
             {/* Sidebar */}
             <Sidebar currentView={currentView} onViewChange={(v) => setCurrentView(v as any)} />
 
