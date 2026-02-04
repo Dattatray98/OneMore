@@ -1,0 +1,28 @@
+{
+  "name": "onemore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd Server && npm start",
+    "client": "cd Client && npm run dev",
+    "install-all": "npm install && cd Client && npm install && cd ../Server && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dattatray98/OneMore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Dattatray98/OneMore/issues"
+  },
+  "homepage": "https://github.com/Dattatray98/OneMore#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
