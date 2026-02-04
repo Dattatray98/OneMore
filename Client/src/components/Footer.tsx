@@ -6,8 +6,8 @@ export const Footer = () => {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col md:flex-row items-start justify-between gap-12 mb-16">
                     <div className="max-w-md">
-                        <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 dark:from-white to-slate-500 dark:to-slate-400 mb-4">
-                            TaskDaily
+                        <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-slate-900 dark:from-white to-slate-500 dark:to-slate-400 mb-4">
+                            OneMore
                         </h3>
                         <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6 font-medium">
                             Master your day with a command center designed for precision, discipline, and focus.
@@ -29,7 +29,7 @@ export const Footer = () => {
 
                 <div className="border-t border-slate-200 dark:border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-slate-500 text-sm">
-                        © {new Date().getFullYear()} TaskDaily. All rights reserved.
+                        © {new Date().getFullYear()} OneMore. All rights reserved.
                     </p>
                     <div className="flex items-center gap-1 text-slate-500 text-sm">
                         <span>Made with</span>
