@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const ChallengeSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true },
+    id: { type: String, required: true },
+    userId: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String },
     dailyRoutine: { type: Array, default: [] },

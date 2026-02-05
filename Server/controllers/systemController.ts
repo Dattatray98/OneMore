@@ -3,12 +3,13 @@ import Task from '../models/Task';
 import Challenge from '../models/Challenge';
 import PomodoroStats from '../models/PomodoroStats';
 
-export const resetAllData = async (req: Request, res: Response) => {
+export const resetAllData = async (req: any, res: Response) => {
     try {
+        const userId = req.auth.userId;
         await Promise.all([
-            Task.deleteMany({}),
-            Challenge.deleteMany({}),
-            PomodoroStats.deleteMany({})
+            Task.deleteMany({ userId }),
+            Challenge.deleteMany({ userId }),
+            PomodoroStats.deleteMany({ userId })
         ]);
         res.json({ success: true });
     } catch (error) {

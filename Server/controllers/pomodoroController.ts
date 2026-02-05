@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import PomodoroStats from '../models/PomodoroStats';
 
-export const getPomodoroStatsByDate = async (req: Request, res: Response) => {
+export const getPomodoroStatsByDate = async (req: any, res: Response) => {
     try {
-        const stats = await PomodoroStats.findOne({ date: req.params.date });
+        const userId = req.auth.userId;
+        const stats = await PomodoroStats.findOne({ date: req.params.date, userId });
         if (!stats) return res.json({ workSecs: 0, breakSecs: 0, sessionCount: 0, sequence: [] });
         res.json(stats);
     } catch (error) {
@@ -11,22 +12,24 @@ export const getPomodoroStatsByDate = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllPomodoroStats = async (req: Request, res: Response) => {
+export const getAllPomodoroStats = async (req: any, res: Response) => {
     try {
-        const stats = await PomodoroStats.find();
+        const userId = req.auth.userId;
+        const stats = await PomodoroStats.find({ userId });
         res.json(stats);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch all pomodoro stats' });
     }
 };
 
-export const updatePomodoroStats = async (req: Request, res: Response) => {
+export const updatePomodoroStats = async (req: any, res: Response) => {
     try {
+        const userId = req.auth.userId;
         const date = req.params.date;
         const data = req.body;
         await PomodoroStats.findOneAndUpdate(
-            { date },
-            { ...data, date },
+            { date, userId },
+            { ...data, date, userId },
             { upsert: true, new: true }
         );
         res.json({ success: true });
@@ -35,9 +38,10 @@ export const updatePomodoroStats = async (req: Request, res: Response) => {
     }
 };
 
-export const clearPomodoroStats = async (req: Request, res: Response) => {
+export const clearPomodoroStats = async (req: any, res: Response) => {
     try {
-        await PomodoroStats.deleteMany({});
+        const userId = req.auth.userId;
+        await PomodoroStats.deleteMany({ userId });
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: 'Failed to clear pomodoro stats' });
