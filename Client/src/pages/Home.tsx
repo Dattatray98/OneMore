@@ -24,7 +24,11 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
     // ROUTING & STATE
     // ================
     const [currentView, setCurrentView] = useState<'my-day' | 'pomodoro' | 'planned' | 'disciplined' | 'settings'>(() => {
-        return (localStorage.getItem('current_view') as any) || 'my-day';
+        const saved = localStorage.getItem('current_view');
+        if (saved && ['my-day', 'pomodoro', 'planned', 'disciplined', 'settings'].includes(saved)) {
+            return saved as any;
+        }
+        return 'my-day';
     });
 
     const {
