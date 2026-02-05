@@ -15,9 +15,10 @@
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "express": "^5.2.1",
-    "mongoose": "^8.9.6",
-    "dotenv": "^16.4.7"
+    "mongoose": "^8.9.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -13,7 +13,7 @@ interface PlannedTasksProps {
     onDelete: (id: string) => void;
     challenges: Challenge[];
     activeChallenge: Challenge | null;
-    onUpdateChallenge: (challenge: Challenge | null) => void;
+    onUpdateChallenge: (challenge: Challenge | null, idToDelete?: string) => void;
     onSelectChallenge: (id: string) => void;
     filter: 'normal' | 'disciplined';
     onFilterChange: (filter: 'normal' | 'disciplined') => void;

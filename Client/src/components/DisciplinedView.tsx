@@ -5,7 +5,7 @@ import type { Challenge } from '../types';
 
 interface DisciplinedViewProps {
     challenge: Challenge | null;
-    onUpdateChallenge: (challenge: Challenge | null) => void;
+    onUpdateChallenge: (challenge: Challenge | null, idToDelete?: string) => void;
     onNavigateToPlanner?: (filter: 'normal' | 'disciplined', view: 'week' | 'day') => void;
     onNavigateToPomodoro?: () => void;
 }
@@ -156,8 +156,8 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
     };
 
     const resetChallenge = () => {
-        if (confirm('Are you sure you want to start over?')) {
-            onUpdateChallenge(null);
+        if (challenge && confirm('Are you sure you want to start over?')) {
+            onUpdateChallenge(null, challenge.id);
             setSelectedDay(null);
         }
     }

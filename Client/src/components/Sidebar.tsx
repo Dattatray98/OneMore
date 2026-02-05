@@ -1,4 +1,4 @@
-import { Home, Calendar, Clock, Settings, CheckSquare } from 'lucide-react';
+import { Home, Calendar, Clock, Settings, CheckSquare, Target } from 'lucide-react';
 
 interface SidebarProps {
     currentView: string;
@@ -23,6 +23,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                 {[
                     { icon: Home, label: 'My Day', id: 'my-day' },
                     { icon: Clock, label: 'Pomodoro', id: 'pomodoro' },
+                    { icon: Target, label: 'Disciplined', id: 'disciplined' },
                     { icon: Calendar, label: 'Planned', id: 'planned' },
                 ].map((item) => (
                     <button

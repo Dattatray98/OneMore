@@ -102,14 +102,16 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
         }
     }, [activeChallengeId]);
 
-    const handleUpdateChallenge = async (updated: Challenge | null) => {
+    const handleUpdateChallenge = async (updated: Challenge | null, idToDelete?: string) => {
         if (!updated) {
             // Delete case
-            if (activeChallengeId) {
-                const idToDelete = activeChallengeId;
-                setChallenges(prev => prev.filter(c => c.id !== idToDelete));
-                setActiveChallengeId(null);
-                await api.deleteChallenge(idToDelete);
+            const targetId = idToDelete || activeChallengeId || (challenges.length > 0 ? challenges[0].id : null);
+            if (targetId) {
+                setChallenges(prev => prev.filter(c => c.id !== targetId));
+                if (activeChallengeId === targetId) {
+                    setActiveChallengeId(null);
+                }
+                await api.deleteChallenge(targetId);
             }
             return;
         }
@@ -191,7 +193,8 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
                                 {currentView === 'my-day' && 'My Day'}
                                 {currentView === 'pomodoro' && 'Pomodoro Focus'}
                                 {currentView === 'planned' && 'Planned Tasks'}
-                                {currentView === 'disciplined' && 'Disciplined'}
+                                {currentView === 'disciplined' && 'Disciplined Protocol'}
+                                {currentView === 'settings' && 'Settings'}
                             </h1>
                             <p className="text-slate-500 dark:text-slate-400">
                                 {currentView === 'my-day'
