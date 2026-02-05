@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/clerk-react';
 
 export const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -35,12 +36,22 @@ export const Navbar = () => {
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-4">
-                    <Link
-                        to="/app"
-                        className="px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-full font-bold text-sm hover:scale-105 transition-transform"
-                    >
-                        Open App
-                    </Link>
+                    <SignedIn>
+                        <UserButton />
+                        <Link
+                            to="/app"
+                            className="px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-full font-bold text-sm hover:scale-105 transition-transform"
+                        >
+                            Open App
+                        </Link>
+                    </SignedIn>
+                    <SignedOut>
+                        <SignInButton mode="modal">
+                            <button className="px-6 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-full font-bold text-sm hover:scale-105 transition-transform cursor-pointer">
+                                Sign In
+                            </button>
+                        </SignInButton>
+                    </SignedOut>
                 </div>
 
                 {/* Mobile Toggle */}

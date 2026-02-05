@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import type { Task } from '../types';
 import { TaskItem } from '../components/TaskItem';
+import { useTasks } from '../hooks/useTasks';
+import { useChallenges } from '../hooks/useChallenges';
 import { TaskInput } from '../components/TaskInput';
 import { TaskModal } from '../components/TaskModal';
 import { Sidebar } from '../components/Sidebar';
@@ -12,7 +14,6 @@ import { DisciplinedView } from '../components/DisciplinedView';
 import { PomodoroView } from '../components/PomodoroView';
 import type { Challenge } from '../types';
 import { SettingsView } from '../components/SettingsView';
-import { api } from '../api';
 
 interface HomeProps {
     theme: 'dark' | 'light' | 'system';
@@ -26,54 +27,33 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
         return (localStorage.getItem('current_view') as any) || 'my-day';
     });
 
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [challenges, setChallenges] = useState<Challenge[]>([]);
+    const {
+        tasks,
+        fetchTasks,
+        addTask: hookAddTask,
+        updateTask: hookUpdateTask,
+        deleteTask: hookDeleteTask
+    } = useTasks();
+
+    const {
+        challenges,
+        fetchChallenges,
+        addChallenge: hookAddChallenge,
+        updateChallenge: hookUpdateChallenge,
+        deleteChallenge: hookDeleteChallenge
+    } = useChallenges();
 
     const [activeChallengeId, setActiveChallengeId] = useState<string | null>(() => {
         return localStorage.getItem('active_challenge_id');
     });
 
-    // LOAD DATA FROM SQLITE
+    // LOAD DATA
     useEffect(() => {
-        const loadData = async () => {
-            try {
-                const [dbTasks, dbChallenges] = await Promise.all([
-                    api.getTasks(),
-                    api.getChallenges()
-                ]);
-
-                // Optional Migration: If DB is empty but localStorage has data
-                if (dbTasks.length === 0 && dbChallenges.length === 0) {
-                    const localTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-                    const localChallenges = JSON.parse(localStorage.getItem('one_more_challenges') || '[]');
-
-                    if (localTasks.length > 0 || localChallenges.length > 0) {
-                        console.log('Migrating data to SQLite...');
-                        await Promise.all([
-                            ...localTasks.map((t: Task) => api.addTask(t)),
-                            ...localChallenges.map((c: Challenge) => api.addChallenge(c))
-                        ]);
-                        const [newTasks, newChallenges] = await Promise.all([
-                            api.getTasks(),
-                            api.getChallenges()
-                        ]);
-                        setTasks(newTasks);
-                        setChallenges(newChallenges);
-                        return;
-                    }
-                }
-
-                setTasks(dbTasks);
-                setChallenges(dbChallenges);
-            } catch (error) {
-                console.error('Failed to load data from SQLite:', error);
-            }
-        };
-        loadData();
-    }, []);
+        fetchTasks();
+        fetchChallenges();
+    }, [fetchTasks, fetchChallenges]);
 
     const activeChallenge = challenges.find(c => c.id === activeChallengeId) || challenges[0] || null;
-
 
     const [plannedFilter, setPlannedFilter] = useState<'normal' | 'disciplined'>('normal');
     const [plannedViewMode, setPlannedViewMode] = useState<'week' | 'day'>('week');
@@ -107,22 +87,19 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
             // Delete case
             const targetId = idToDelete || activeChallengeId || (challenges.length > 0 ? challenges[0].id : null);
             if (targetId) {
-                setChallenges(prev => prev.filter(c => c.id !== targetId));
                 if (activeChallengeId === targetId) {
                     setActiveChallengeId(null);
                 }
-                await api.deleteChallenge(targetId);
+                await hookDeleteChallenge(targetId);
             }
             return;
         }
 
         const exists = challenges.find(c => c.id === updated.id);
         if (exists) {
-            setChallenges(prev => prev.map(c => c.id === updated.id ? updated : c));
-            await api.updateChallenge(updated.id, updated);
+            await hookUpdateChallenge(updated.id, updated);
         } else {
-            setChallenges(prev => [...prev, updated]);
-            await api.addChallenge(updated);
+            await hookAddChallenge(updated);
         }
         setActiveChallengeId(updated.id);
     };
@@ -130,8 +107,6 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
     const handleSelectChallenge = (id: string) => {
         setActiveChallengeId(id);
     };
-
-
 
     const addTask = async (taskOrText: string | Partial<Task>) => {
         const newTask: Task = {
@@ -142,15 +117,11 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
             scheduledDate: format(new Date(), 'yyyy-MM-dd'),
             ...(typeof taskOrText === 'object' ? taskOrText : {}),
         };
-        setTasks((prev) => [newTask, ...prev]);
-        await api.addTask(newTask);
+        await hookAddTask(newTask);
     };
 
     const updateTask = async (id: string, updates: Partial<Task>) => {
-        setTasks((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
-        );
-        await api.updateTask(id, updates);
+        await hookUpdateTask(id, updates);
     };
 
     const toggleTask = (id: string) => {
@@ -161,8 +132,7 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
     };
 
     const deleteTask = async (id: string) => {
-        setTasks((prev) => prev.filter((t) => t.id !== id));
-        await api.deleteTask(id);
+        await hookDeleteTask(id);
     };
 
     const activeTasks = tasks.filter(t => !t.completed);
@@ -403,6 +373,7 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
                             onAddTask={addTask}
                             initialAutoImport={pomodoroAutoImport}
                             directImportTasks={pomodoroDirectTasks}
+                            onUpdateChallenge={handleUpdateChallenge}
                         />
                     )}
 

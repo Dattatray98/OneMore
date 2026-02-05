@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Target, CheckCircle2, ListTodo, ChevronUp, ChevronDown, Edit3, X, Plus, Trash2, Sun, Shield, ListPlus, ChevronLeft, Settings } from 'lucide-react';
 import { api } from '../api';
 import type { Task, Challenge } from '../types';
@@ -12,8 +12,12 @@ const FocusAnalyzer = ({ dailyStats, onClear, history }: { dailyStats: { workSec
     const timeStatsRecord: Record<string, any> = {};
 
     history.forEach(h => {
-        sessionStats[h.date] = h.sessionCount;
-        timeStatsRecord[h.date] = { workSecs: h.workSecs, breakSecs: h.breakSecs };
+        const stats = timeStatsRecord[h.date] || { workSecs: 0, breakSecs: 0 };
+        sessionStats[h.date] = (sessionStats[h.date] || 0) + h.sessionCount;
+        timeStatsRecord[h.date] = {
+            workSecs: stats.workSecs + h.workSecs,
+            breakSecs: stats.breakSecs + h.breakSecs
+        };
     });
 
     const data = Array.from({ length: 7 }).map((_, i) => {
@@ -177,9 +181,10 @@ interface PomodoroViewProps {
 
     initialAutoImport?: 'my-day' | 'protocol' | 'direct' | null;
     directImportTasks?: Task[];
+    onUpdateChallenge?: (challenge: Challenge | null, idToDelete?: string) => void;
 }
 
-export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallenge, onToggleTask, onUpdateTask, onAddTask, initialAutoImport, directImportTasks }) => {
+export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallenge, onToggleTask, onUpdateTask, onAddTask, initialAutoImport, directImportTasks, onUpdateChallenge }) => {
     const [mode, setMode] = useState<'work' | 'shortBreak' | 'longBreak'>('work');
     const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
@@ -223,14 +228,16 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
             const stats = await api.getPomodoroStats(todayStr);
             const history = await api.getAllPomodoroStats();
 
-            setDailyStats({ workSecs: stats.workSecs, breakSecs: stats.breakSecs });
-            setSessionCount(stats.sessionCount);
+            setDailyStats({ workSecs: stats.workSecs || 0, breakSecs: stats.breakSecs || 0 });
+            setSessionCount(stats.sessionCount || 0);
             setOrderedTasks(stats.sequence || []);
             setAllHistory(history);
         };
         loadPomodoroData();
+    }, [todayStr, statsUpdateTrigger]);
 
-        // Load Settings (Still in localStorage is fine as it's 'necessary' config)
+    // Load Settings (Still in localStorage is fine as it's 'necessary' config)
+    useEffect(() => {
         const savedSettings = localStorage.getItem('pomodoro_settings');
         if (savedSettings) {
             setSettings(JSON.parse(savedSettings));
@@ -241,30 +248,34 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
     const [tempSettings, setTempSettings] = useState(settings);
 
     const incrementSessionCount = async () => {
-        const newCount = sessionCount + 1;
-        setSessionCount(newCount);
-        await api.savePomodoroStats(todayStr, { ...dailyStats, sessionCount: newCount, sequence: orderedTasks });
+        setSessionCount(prev => {
+            const newCount = prev + 1;
+            api.savePomodoroStats(todayStr, { ...dailyStats, sessionCount: newCount, sequence: orderedTasks });
+            return newCount;
+        });
         setStatsUpdateTrigger(prev => prev + 1);
     };
 
-    const updateDailyStats = async (type: 'work' | 'break', seconds: number) => {
-        const newStats = {
-            ...dailyStats,
-            [type === 'work' ? 'workSecs' : 'breakSecs']: dailyStats[type === 'work' ? 'workSecs' : 'breakSecs'] + seconds
-        };
-        setDailyStats(newStats);
-        await api.savePomodoroStats(todayStr, { ...newStats, sessionCount, sequence: orderedTasks });
+    const updateDailyStats = async (type: 'work' | 'break', seconds: number, forceSessionCount?: number) => {
+        setDailyStats(prev => {
+            const newStats = {
+                ...prev,
+                [type === 'work' ? 'workSecs' : 'breakSecs']: prev[type === 'work' ? 'workSecs' : 'breakSecs'] + seconds
+            };
+            const currentSessionCount = forceSessionCount !== undefined ? forceSessionCount : sessionCount;
+            api.savePomodoroStats(todayStr, { ...newStats, sessionCount: currentSessionCount, sequence: orderedTasks });
+            return newStats;
+        });
     };
 
     const clearAllStats = async () => {
-        // Clear via API is handled in Settings, but if called locally:
-        // For simplicity, we can just clear current day or all
+        await api.clearPomodoroHistory();
         setDailyStats({ workSecs: 0, breakSecs: 0 });
         setSessionCount(0);
+        setAllHistory([]);
         setStatsUpdateTrigger(prev => prev + 1);
     };
 
-    const timerRef = useRef<any>(null);
     const [tempDurations, setTempDurations] = useState(durations);
 
     // Save durations to local storage? Optional but good UX.
@@ -309,34 +320,33 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         setTempSettings({ autoStartBreak: true, autoStartWork: false });
     };
 
-    // Auto-Transition Logic
+    // Optimized Timer Logic (Avoids drift and per-second re-renders of the effect)
     useEffect(() => {
+        let interval: any = null;
+
         if (isActive && timeLeft > 0) {
-            timerRef.current = setInterval(() => {
+            interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1);
             }, 1000);
         } else if (timeLeft === 0) {
             setIsActive(false);
-            if (timerRef.current) clearInterval(timerRef.current);
+            if (interval) clearInterval(interval);
 
-            const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-            audio.play();
+            // Notify user
+            try {
+                const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                audio.play().catch(() => { }); // Catch browser auto-play blocks
+            } catch (e) { }
 
             if (mode === 'work') {
-                // Record Session
-                const todayKey = format(new Date(), 'yyyy-MM-dd');
-                const savedStats = JSON.parse(localStorage.getItem('pomodoro_stats') || '{}');
-                savedStats[todayKey] = (savedStats[todayKey] || 0) + 1;
-                localStorage.setItem('pomodoro_stats', JSON.stringify(savedStats));
+                const nextSessionCount = sessionCount + 1;
 
-                // Update Time Stats
-                updateDailyStats('work', durations.work * 60);
+                // Update everything in one go to ensure data integrity
+                setSessionCount(nextSessionCount);
+                updateDailyStats('work', durations.work * 60, nextSessionCount);
 
-                // Trigger stats refresh
                 setStatsUpdateTrigger(prev => prev + 1);
 
-                const nextSessionCount = sessionCount + 1;
-                setSessionCount(nextSessionCount);
                 if (nextSessionCount % 4 === 0) {
                     setMode('longBreak');
                     setTimeLeft(durations.longBreak * 60);
@@ -344,21 +354,19 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                     setMode('shortBreak');
                     setTimeLeft(durations.shortBreak * 60);
                 }
-                setIsActive(settings.autoStartBreak); // Auto-start break based on setting
+                setIsActive(settings.autoStartBreak);
             } else {
-                // Break Finished - Record Break Time
                 updateDailyStats('break', (mode === 'shortBreak' ? durations.shortBreak : durations.longBreak) * 60);
-
                 setMode('work');
                 setTimeLeft(durations.work * 60);
-                setIsActive(settings.autoStartWork); // Auto-start work based on setting
+                setIsActive(settings.autoStartWork);
             }
         }
 
         return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
+            if (interval) clearInterval(interval);
         };
-    }, [isActive, timeLeft, mode, sessionCount]);
+    }, [isActive, timeLeft === 0, mode, durations, settings]);
 
     const toggleTimer = () => setIsActive(!isActive);
 
@@ -407,14 +415,52 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
     useEffect(() => {
         setOrderedTasks(prev => {
             return prev.map(t => {
+                // Sync Regular Tasks
                 const fresh = tasks.find(pt => pt.id === t.id);
                 if (fresh) {
                     return { ...t, completed: fresh.completed, text: fresh.text, scheduledTime: fresh.scheduledTime };
                 }
+
+                // Sync Protocol Tasks
+                if (t.isProtocol && t.id.startsWith('protocol-') && activeChallenge) {
+                    const idx = parseInt(t.id.split('-')[1]);
+                    const today = new Date();
+                    const diff = differenceInDays(today, parseISO(activeChallenge.startDate)) + 1;
+                    const isCompleted = activeChallenge.dailyProgress?.[diff]?.[idx] || false;
+
+                    if (t.completed !== isCompleted) {
+                        return { ...t, completed: isCompleted };
+                    }
+                }
                 return t;
             });
         });
-    }, [tasks]);
+    }, [tasks, activeChallenge]);
+
+    const handleToggleLocal = (id: string) => {
+        if (id.startsWith('protocol-')) {
+            if (activeChallenge && onUpdateChallenge) {
+                const idx = parseInt(id.split('-')[1]);
+                const today = new Date();
+                const diff = differenceInDays(today, parseISO(activeChallenge.startDate)) + 1;
+
+                const newProgress = { ...activeChallenge.dailyProgress };
+                // Ensure we clone the specific day's array to avoid mutation
+                const dayProgress = newProgress[diff] ? [...newProgress[diff]] : [];
+                newProgress[diff] = dayProgress;
+
+                const currentVal = dayProgress[idx] || false;
+                dayProgress[idx] = !currentVal;
+
+                onUpdateChallenge({
+                    ...activeChallenge,
+                    dailyProgress: newProgress
+                });
+            }
+        } else {
+            onToggleTask(id);
+        }
+    };
 
     // Save to DB
     useEffect(() => {
@@ -755,8 +801,8 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                                 }`}
                             onClick={() => {
                                 if (selectedTaskId && mode === 'work') {
-                                    // 1. Mark in global state
-                                    onToggleTask(selectedTaskId);
+                                    // 1. Mark in global or protocol state
+                                    handleToggleLocal(selectedTaskId);
 
                                     // 2. Remove from sequence locally
                                     setOrderedTasks(prev => prev.filter(t => t.id !== selectedTaskId));
@@ -886,12 +932,22 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                                                     <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600">
                                                         {task.scheduledTime ? format(new Date(`2000-01-01T${task.scheduledTime}`), 'h:mm a') : 'Flex'}
                                                     </span>
+                                                    {task.completed && (
+                                                        <span className="text-[8px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded border border-emerald-500/20 uppercase tracking-tighter">Done</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Hover Controls */}
                                         <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleToggleLocal(task.id); }}
+                                                className={`p-1.5 rounded-lg transition-colors ${task.completed ? 'text-emerald-500' : 'text-slate-400 hover:text-emerald-500'}`}
+                                                title={task.completed ? "Mark as pending" : "Mark as completed"}
+                                            >
+                                                <CheckCircle2 size={14} />
+                                            </button>
                                             <button
                                                 onClick={() => removeTaskFromSequence(index)}
                                                 className="p-1.5 text-slate-600 hover:text-red-400 transition-colors"

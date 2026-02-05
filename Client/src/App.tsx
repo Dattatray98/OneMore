@@ -2,8 +2,23 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home'
 import { Landing } from './pages/Landing'
 import { useState, useEffect } from 'react';
+import { SignedIn, SignedOut, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
+import { setApiToken } from './api';
 
 function App() {
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    const syncToken = async () => {
+      const token = await getToken();
+      setApiToken(token);
+    };
+    syncToken();
+    // Re-run periodically to handle expiry or component mount
+    const interval = setInterval(syncToken, 60000);
+    return () => clearInterval(interval);
+  }, [getToken]);
+
   const [theme, setTheme] = useState<'dark' | 'light' | 'system'>(() => {
     return (localStorage.getItem('theme') as any) || 'dark';
   });
@@ -31,7 +46,21 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/app" element={<Home theme={theme} setTheme={setTheme} />} />
+
+        {/* Protected Route */}
+        <Route
+          path="/app"
+          element={
+            <>
+              <SignedIn>
+                <Home theme={theme} setTheme={setTheme} />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
       </Routes>
     </Router>
   )

@@ -1,80 +1,90 @@
+import axios from 'axios';
 import type { Task, Challenge } from './types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+let authToken: string | null = null;
+
+export const setApiToken = (token: string | null) => {
+    authToken = token;
+};
+
+const axiosInstance = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Request Interceptor to add Token
+axiosInstance.interceptors.request.use((config) => {
+    if (authToken) {
+        config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+// Response Interceptor for Error Handling (Optional but good)
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // You can handle global 401s here if needed
+        return Promise.reject(error.response?.data?.error || error.message || 'API Error');
+    }
+);
+
 export const api = {
     // TASKS
     getTasks: async (): Promise<Task[]> => {
-        const res = await fetch(`${API_URL}/tasks`);
-        return res.json();
+        const res = await axiosInstance.get('/tasks');
+        return res.data;
     },
     addTask: async (task: Task): Promise<Task> => {
-        const res = await fetch(`${API_URL}/tasks`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(task),
-        });
-        return res.json();
+        const res = await axiosInstance.post('/tasks', task);
+        return res.data;
     },
     updateTask: async (id: string, updates: Partial<Task>): Promise<void> => {
-        await fetch(`${API_URL}/tasks/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updates),
-        });
+        await axiosInstance.put(`/tasks/${id}`, updates);
     },
     deleteTask: async (id: string): Promise<void> => {
-        await fetch(`${API_URL}/tasks/${id}`, {
-            method: 'DELETE',
-        });
+        await axiosInstance.delete(`/tasks/${id}`);
     },
 
     // CHALLENGES
     getChallenges: async (): Promise<Challenge[]> => {
-        const res = await fetch(`${API_URL}/challenges`);
-        return res.json();
+        const res = await axiosInstance.get('/challenges');
+        return res.data;
     },
     addChallenge: async (challenge: Challenge): Promise<Challenge> => {
-        const res = await fetch(`${API_URL}/challenges`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(challenge),
-        });
-        return res.json();
+        const res = await axiosInstance.post('/challenges', challenge);
+        return res.data;
     },
     updateChallenge: async (id: string, challenge: Challenge): Promise<void> => {
-        await fetch(`${API_URL}/challenges/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(challenge),
-        });
+        await axiosInstance.put(`/challenges/${id}`, challenge);
     },
     deleteChallenge: async (id: string): Promise<void> => {
-        await fetch(`${API_URL}/challenges/${id}`, {
-            method: 'DELETE',
-        });
+        await axiosInstance.delete(`/challenges/${id}`);
     },
 
     resetData: async (): Promise<void> => {
-        await fetch(`${API_URL}/danger/reset`, {
-            method: 'DELETE',
-        });
+        await axiosInstance.delete('/danger/reset');
     },
 
     // POMODORO
     getPomodoroStats: async (date: string): Promise<any> => {
-        const res = await fetch(`${API_URL}/pomodoro/stats/${date}`);
-        return res.json();
+        const res = await axiosInstance.get(`/pomodoro/stats/${date}`);
+        return res.data;
     },
     getAllPomodoroStats: async (): Promise<any[]> => {
-        const res = await fetch(`${API_URL}/pomodoro/stats`);
-        return res.json();
+        const res = await axiosInstance.get('/pomodoro/stats');
+        return res.data;
     },
     savePomodoroStats: async (date: string, data: any): Promise<void> => {
-        await fetch(`${API_URL}/pomodoro/stats/${date}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
+        await axiosInstance.post(`/pomodoro/stats/${date}`, data);
+    },
+    clearPomodoroHistory: async (): Promise<void> => {
+        await axiosInstance.delete('/pomodoro/stats');
     }
 };
