@@ -54,9 +54,12 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
     const [modalDefaultTime, setModalDefaultTime] = useState<string | undefined>(undefined);
     const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
 
+    const safeTasks = Array.isArray(tasks) ? tasks : [];
+    const safeChallenges = Array.isArray(challenges) ? challenges : [];
+
     // 1. Normal Task Dates
     const normalDates = Array.from(new Set(
-        tasks
+        safeTasks
             .filter(t => t.scheduledDate && new Date(t.scheduledDate) >= today_raw)
             .map(t => t.scheduledDate!)
     )).map(dateStr => {
@@ -256,7 +259,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
         const diff = activeChallenge ? differenceInDays(date, parseISO(activeChallenge.startDate)) + 1 : 0;
         const isProtocolDay = activeChallenge && diff >= 1 && diff <= activeChallenge.days;
 
-        const regularTasksForDay = tasks.filter(t => t.scheduledDate === dayDateStr);
+        const regularTasksForDay = safeTasks.filter(t => t.scheduledDate === dayDateStr);
 
         const protocolTasks = isProtocolDay ? activeChallenge!.dailyRoutine.map((item, idx) => {
             const override = activeChallenge!.dailyOverrides?.[diff]?.[idx];
@@ -327,7 +330,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
                         {/* Existing Challenges List */}
                         <div className="flex flex-col gap-3">
-                            {challenges.map((c) => {
+                            {safeChallenges.map((c) => {
                                 const progress = Math.round((c.completedDays.length / c.days) * 100);
                                 return (
                                     <div
@@ -388,7 +391,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                     <span className="text-xs font-bold uppercase tracking-widest">Manual Schedule</span>
                                 </button>
 
-                                {challenges.map(c => (
+                                {safeChallenges.map(c => (
                                     <button
                                         key={c.id}
                                         onClick={() => {
