@@ -15,6 +15,9 @@ const ChallengeSchema = new mongoose.Schema({
     history: { type: Array, default: [] }
 });
 
+ChallengeSchema.index({ userId: 1 });
+ChallengeSchema.index({ id: 1, userId: 1 }, { unique: true });
+
 const Challenge = mongoose.model('Challenge', ChallengeSchema);
 
 export default Challenge;

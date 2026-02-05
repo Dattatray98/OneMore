@@ -9,6 +9,8 @@ const PomodoroStatsSchema = new mongoose.Schema({
     sequence: { type: Array, default: [] }
 });
 
+PomodoroStatsSchema.index({ date: 1, userId: 1 }, { unique: true });
+
 const PomodoroStats = mongoose.model('PomodoroStats', PomodoroStatsSchema);
 
 export default PomodoroStats;

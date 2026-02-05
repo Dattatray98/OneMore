@@ -12,6 +12,9 @@ const TaskSchema = new mongoose.Schema({
     protocolIdx: { type: Number }
 });
 
+TaskSchema.index({ userId: 1 });
+TaskSchema.index({ id: 1, userId: 1 }, { unique: true });
+
 const Task = mongoose.model('Task', TaskSchema);
 
 export default Task;
