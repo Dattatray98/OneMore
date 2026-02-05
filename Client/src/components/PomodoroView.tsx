@@ -11,7 +11,8 @@ const FocusAnalyzer = ({ dailyStats, onClear, history }: { dailyStats: { workSec
     const sessionStats: Record<string, number> = {};
     const timeStatsRecord: Record<string, any> = {};
 
-    history.forEach(h => {
+    const safeHistory = Array.isArray(history) ? history : [];
+    safeHistory.forEach(h => {
         const stats = timeStatsRecord[h.date] || { workSecs: 0, breakSecs: 0 };
         sessionStats[h.date] = (sessionStats[h.date] || 0) + h.sessionCount;
         timeStatsRecord[h.date] = {
@@ -231,7 +232,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
             setDailyStats({ workSecs: stats.workSecs || 0, breakSecs: stats.breakSecs || 0 });
             setSessionCount(stats.sessionCount || 0);
             setOrderedTasks(stats.sequence || []);
-            setAllHistory(history);
+            setAllHistory(Array.isArray(history) ? history : []);
         };
         loadPomodoroData();
     }, [todayStr, statsUpdateTrigger]);
@@ -416,7 +417,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         setOrderedTasks(prev => {
             return prev.map(t => {
                 // Sync Regular Tasks
-                const fresh = tasks.find(pt => pt.id === t.id);
+                const fresh = (Array.isArray(tasks) ? tasks : []).find(pt => pt.id === t.id);
                 if (fresh) {
                     return { ...t, completed: fresh.completed, text: fresh.text, scheduledTime: fresh.scheduledTime };
                 }
@@ -465,7 +466,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
     // Save to DB
     useEffect(() => {
         const syncSequence = async () => {
-            if (orderedTasks.length > 0) {
+            if (Array.isArray(orderedTasks) && orderedTasks.length > 0) {
                 await api.savePomodoroStats(todayStr, { ...dailyStats, sessionCount, sequence: orderedTasks });
             }
         };
@@ -481,7 +482,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         if (source === 'direct') {
             if (!directImportTasks || directImportTasks.length === 0) return;
             // Filter out tasks already in sequence
-            const existingIds = new Set(orderedTasks.map(t => t.id));
+            const existingIds = new Set((Array.isArray(orderedTasks) ? orderedTasks : []).map(t => t.id));
             const newCandidates = directImportTasks.filter(t => !existingIds.has(t.id) && !t.completed);
 
             if (newCandidates.length === 0) return;
@@ -518,14 +519,14 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                     } as any;
                 }).filter(Boolean);
 
-                const newCandidates = todayProtocolTasks.filter(p => !orderedTasks.some(existing => existing.id === p.id));
+                const newCandidates = todayProtocolTasks.filter(p => !(Array.isArray(orderedTasks) ? orderedTasks : []).some(existing => existing.id === p.id));
                 setImportCandidates(newCandidates);
                 setSelectedImportIds(new Set(newCandidates.map(c => c.id)));
                 setImportModal('protocol');
             }
         } else if (source === 'my-day') {
-            const myDayTasks = tasks.filter(t => t.scheduledDate === todayStr && !t.completed);
-            const newCandidates = myDayTasks.filter(t => !orderedTasks.some(existing => existing.id === t.id));
+            const myDayTasks = (Array.isArray(tasks) ? tasks : []).filter(t => t.scheduledDate === todayStr && !t.completed);
+            const newCandidates = myDayTasks.filter(t => !(Array.isArray(orderedTasks) ? orderedTasks : []).some(existing => existing.id === t.id));
 
             setImportCandidates(newCandidates);
             setSelectedImportIds(new Set(newCandidates.map(c => c.id)));
@@ -591,13 +592,13 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
             newTasks.splice(index, 1);
             return newTasks;
         });
-        if (selectedTaskId === orderedTasks[index]?.id) {
+        if (selectedTaskId === (Array.isArray(orderedTasks) ? orderedTasks : [])[index]?.id) {
             setSelectedTaskId(null);
         }
     };
 
     const moveTask = (idx: number, direction: 'up' | 'down') => {
-        const newTasks = [...orderedTasks];
+        const newTasks = [...(Array.isArray(orderedTasks) ? orderedTasks : [])];
         const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
         if (targetIdx < 0 || targetIdx >= newTasks.length) return;
 
@@ -618,7 +619,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         setEditingTaskId(null);
     };
 
-    const selectedTask = orderedTasks.find(t => t.id === selectedTaskId);
+    const selectedTask = (Array.isArray(orderedTasks) ? orderedTasks : []).find(t => t.id === selectedTaskId);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in p-0">

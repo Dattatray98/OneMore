@@ -57,7 +57,8 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
         fetchChallenges();
     }, [fetchTasks, fetchChallenges]);
 
-    const activeChallenge = challenges.find(c => c.id === activeChallengeId) || challenges[0] || null;
+    const safeChallenges = Array.isArray(challenges) ? challenges : [];
+    const activeChallenge = safeChallenges.find(c => c.id === activeChallengeId) || safeChallenges[0] || null;
 
     const [plannedFilter, setPlannedFilter] = useState<'normal' | 'disciplined'>('normal');
     const [plannedViewMode, setPlannedViewMode] = useState<'week' | 'day'>('week');
@@ -139,8 +140,9 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
         await hookDeleteTask(id);
     };
 
-    const activeTasks = tasks.filter(t => !t.completed);
-    const completedTasks = tasks.filter(t => t.completed);
+    const safeTasks = Array.isArray(tasks) ? tasks : [];
+    const activeTasks = safeTasks.filter(t => !t.completed);
+    const completedTasks = safeTasks.filter(t => t.completed);
 
     const today = new Date();
 

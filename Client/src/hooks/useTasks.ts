@@ -11,7 +11,7 @@ export const useTasks = () => {
         setLoading(true);
         try {
             const data = await api.getTasks();
-            setTasks(data);
+            setTasks(Array.isArray(data) ? data : []);
             setError(null);
         } catch (err: any) {
             setError(err.message || 'Failed to fetch tasks');

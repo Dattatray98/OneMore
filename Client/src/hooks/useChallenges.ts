@@ -11,7 +11,7 @@ export const useChallenges = () => {
         setLoading(true);
         try {
             const data = await api.getChallenges();
-            setChallenges(data);
+            setChallenges(Array.isArray(data) ? data : []);
             setError(null);
         } catch (err: any) {
             setError(err.message || 'Failed to fetch challenges');
