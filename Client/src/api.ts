@@ -1,77 +1,80 @@
 import type { Task, Challenge } from './types';
 
-// Mock API that uses localStorage for persistence
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 export const api = {
     // TASKS
     getTasks: async (): Promise<Task[]> => {
-        const saved = localStorage.getItem('tasks');
-        return saved ? JSON.parse(saved) : [];
+        const res = await fetch(`${API_URL}/tasks`);
+        return res.json();
     },
     addTask: async (task: Task): Promise<Task> => {
-        const tasks = await api.getTasks();
-        const updated = [task, ...tasks];
-        localStorage.setItem('tasks', JSON.stringify(updated));
-        return task;
+        const res = await fetch(`${API_URL}/tasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(task),
+        });
+        return res.json();
     },
     updateTask: async (id: string, updates: Partial<Task>): Promise<void> => {
-        const tasks = await api.getTasks();
-        const updated = tasks.map(t => t.id === id ? { ...t, ...updates } : t);
-        localStorage.setItem('tasks', JSON.stringify(updated));
+        await fetch(`${API_URL}/tasks/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates),
+        });
     },
     deleteTask: async (id: string): Promise<void> => {
-        const tasks = await api.getTasks();
-        const updated = tasks.filter(t => t.id !== id);
-        localStorage.setItem('tasks', JSON.stringify(updated));
+        await fetch(`${API_URL}/tasks/${id}`, {
+            method: 'DELETE',
+        });
     },
 
     // CHALLENGES
     getChallenges: async (): Promise<Challenge[]> => {
-        const saved = localStorage.getItem('one_more_challenges');
-        return saved ? JSON.parse(saved) : [];
+        const res = await fetch(`${API_URL}/challenges`);
+        return res.json();
     },
     addChallenge: async (challenge: Challenge): Promise<Challenge> => {
-        const challenges = await api.getChallenges();
-        const updated = [...challenges, challenge];
-        localStorage.setItem('one_more_challenges', JSON.stringify(updated));
-        return challenge;
+        const res = await fetch(`${API_URL}/challenges`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(challenge),
+        });
+        return res.json();
     },
     updateChallenge: async (id: string, challenge: Challenge): Promise<void> => {
-        const challenges = await api.getChallenges();
-        const updated = challenges.map(c => c.id === id ? challenge : c);
-        localStorage.setItem('one_more_challenges', JSON.stringify(updated));
+        await fetch(`${API_URL}/challenges/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(challenge),
+        });
     },
     deleteChallenge: async (id: string): Promise<void> => {
-        const challenges = await api.getChallenges();
-        const updated = challenges.filter(c => c.id !== id);
-        localStorage.setItem('one_more_challenges', JSON.stringify(updated));
+        await fetch(`${API_URL}/challenges/${id}`, {
+            method: 'DELETE',
+        });
     },
 
     resetData: async (): Promise<void> => {
-        localStorage.removeItem('tasks');
-        localStorage.removeItem('one_more_challenges');
-        localStorage.removeItem('pomodoro_stats');
+        await fetch(`${API_URL}/danger/reset`, {
+            method: 'DELETE',
+        });
     },
 
     // POMODORO
     getPomodoroStats: async (date: string): Promise<any> => {
-        const stats = await api.getAllPomodoroStats();
-        const found = stats.find((s: any) => s.date === date);
-        return found || { workSecs: 0, breakSecs: 0, sessionCount: 0, sequence: [] };
+        const res = await fetch(`${API_URL}/pomodoro/stats/${date}`);
+        return res.json();
     },
     getAllPomodoroStats: async (): Promise<any[]> => {
-        const saved = localStorage.getItem('pomodoro_stats');
-        return saved ? JSON.parse(saved) : [];
+        const res = await fetch(`${API_URL}/pomodoro/stats`);
+        return res.json();
     },
     savePomodoroStats: async (date: string, data: any): Promise<void> => {
-        const stats = await api.getAllPomodoroStats();
-        const index = stats.findIndex((s: any) => s.date === date);
-        const entry = { ...data, date };
-
-        if (index > -1) {
-            stats[index] = entry;
-        } else {
-            stats.push(entry);
-        }
-        localStorage.setItem('pomodoro_stats', JSON.stringify(stats));
+        await fetch(`${API_URL}/pomodoro/stats/${date}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
     }
 };

@@ -14,7 +14,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                     <CheckSquare size={20} />
                 </div>
                 <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-600 to-blue-700 dark:from-white dark:to-slate-400 tracking-tight">
-                    OneMore
+                    TaskDaily
                 </span>
             </div>
 

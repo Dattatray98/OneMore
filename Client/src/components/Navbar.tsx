@@ -29,7 +29,7 @@ export const Navbar = () => {
                         <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <span className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-slate-900 dark:from-white via-slate-700 dark:via-slate-200 to-slate-500 dark:to-slate-400 tracking-tight">
-                        OneMore
+                        TaskDaily
                     </span>
                 </div>
 
