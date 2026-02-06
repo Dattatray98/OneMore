@@ -3,7 +3,7 @@ import PomodoroStats from '../models/PomodoroStats';
 
 export const getPomodoroStatsByDate = async (req: any, res: Response) => {
     try {
-        const userId = req.auth.userId;
+        const userId = req.auth?.userId;
         const stats = await PomodoroStats.findOne({ date: req.params.date, userId });
         if (!stats) return res.json({ workSecs: 0, breakSecs: 0, sessionCount: 0, sequence: [] });
         res.json(stats);
@@ -14,7 +14,7 @@ export const getPomodoroStatsByDate = async (req: any, res: Response) => {
 
 export const getAllPomodoroStats = async (req: any, res: Response) => {
     try {
-        const userId = req.auth.userId;
+        const userId = req.auth?.userId;
         const stats = await PomodoroStats.find({ userId });
         res.json(stats);
     } catch (error) {
@@ -24,7 +24,7 @@ export const getAllPomodoroStats = async (req: any, res: Response) => {
 
 export const updatePomodoroStats = async (req: any, res: Response) => {
     try {
-        const userId = req.auth.userId;
+        const userId = req.auth?.userId;
         const date = req.params.date;
         const data = req.body;
         await PomodoroStats.findOneAndUpdate(
@@ -40,7 +40,7 @@ export const updatePomodoroStats = async (req: any, res: Response) => {
 
 export const clearPomodoroStats = async (req: any, res: Response) => {
     try {
-        const userId = req.auth.userId;
+        const userId = req.auth?.userId;
         await PomodoroStats.deleteMany({ userId });
         res.json({ success: true });
     } catch (error) {

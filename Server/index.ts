@@ -22,6 +22,9 @@ app.use(cors({
         'http://localhost:5173',
         'http://localhost:5174',
         'http://localhost:5175',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
+        'http://127.0.0.1:5175',
         ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -43,6 +46,12 @@ app.use('/api/tasks', requireAuth(), taskRoutes);
 app.use('/api/challenges', requireAuth(), challengeRoutes);
 app.use('/api/pomodoro', requireAuth(), pomodoroRoutes);
 app.use('/api', requireAuth(), systemRoutes);
+
+// Error Handling
+app.use((err: any, req: any, res: any, next: any) => {
+    console.error('Server Error:', err);
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
+});
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
