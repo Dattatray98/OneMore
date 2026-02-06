@@ -4,7 +4,7 @@ import { api } from '../api';
 import type { Task, Challenge } from '../types';
 import { differenceInDays, parseISO, format, subDays } from 'date-fns';
 
-const FocusAnalyzer = ({ dailyStats, onClear, history }: { dailyStats: { workSecs: number, breakSecs: number }, onClear: () => void, history: any[] }) => {
+const FocusAnalyzer = ({ dailyStats, onClear, history, sessionCount }: { dailyStats: { workSecs: number, breakSecs: number }, onClear: () => void, history: any[], sessionCount?: number }) => {
     const today = new Date();
     const [hoveredData, setHoveredData] = useState<{ x: number, y: number, day: string, hours: string, sessions: number } | null>(null);
 
@@ -24,14 +24,26 @@ const FocusAnalyzer = ({ dailyStats, onClear, history }: { dailyStats: { workSec
     const data = Array.from({ length: 7 }).map((_, i) => {
         const d = subDays(today, 6 - i);
         const dayStr = format(d, 'yyyy-MM-dd');
-        const timeStats = timeStatsRecord[dayStr] || { workSecs: 0 };
-        const workSecs = timeStats.workSecs !== undefined ? timeStats.workSecs : (timeStats.workMins || 0) * 60;
+        const isToday = format(today, 'yyyy-MM-dd') === dayStr;
+
+        let workSecs = 0;
+        let sessions = 0;
+
+        if (isToday) {
+            workSecs = dailyStats.workSecs;
+            sessions = sessionCount ?? (sessionStats[dayStr] || 0);
+        } else {
+            const timeStats = timeStatsRecord[dayStr] || { workSecs: 0 };
+            workSecs = timeStats.workSecs !== undefined ? timeStats.workSecs : (timeStats.workMins || 0) * 60;
+            sessions = sessionStats[dayStr] || 0;
+        }
+
         const hours = workSecs / 3600;
         return {
             day: format(d, 'EEE'),
             fullDate: format(d, 'MMM d'),
             value: Number(hours.toFixed(2)),
-            sessions: sessionStats[dayStr] || 0,
+            sessions: sessions,
             formattedDuration: formatDuration(workSecs)
         };
     });
@@ -852,7 +864,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
             {/* Focus Analyzer Column */}
             <div className="lg:col-span-1 space-y-6">
 
-                <FocusAnalyzer dailyStats={dailyStats} onClear={clearAllStats} history={allHistory} />
+                <FocusAnalyzer dailyStats={dailyStats} onClear={clearAllStats} history={allHistory} sessionCount={sessionCount} />
 
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-[32px] p-6 h-[calc(100vh-28rem)] flex flex-col shadow-xl dark:shadow-none">
                     <div className="flex items-center justify-between mb-8 shrink-0">

@@ -7,6 +7,7 @@ import taskRoutes from './routes/taskRoutes';
 import challengeRoutes from './routes/challengeRoutes';
 import pomodoroRoutes from './routes/pomodoroRoutes';
 import systemRoutes from './routes/systemRoutes';
+import { authMiddleware } from './middleware/authMiddleware';
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.get('/health', (req, res) => {
 
 // Protected Routes
 app.use(clerkMiddleware());
+app.use(authMiddleware);
 
 app.use('/api/tasks', requireAuth(), taskRoutes);
 app.use('/api/challenges', requireAuth(), challengeRoutes);

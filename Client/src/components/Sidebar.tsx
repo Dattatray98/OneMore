@@ -1,4 +1,5 @@
 import { Home, Calendar, Clock, Settings, CheckSquare, Target } from 'lucide-react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 
 interface SidebarProps {
     currentView: string;
@@ -6,6 +7,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) => {
+    const { user } = useUser();
     return (
         <aside className="w-64 h-screen bg-white/80 dark:bg-slate-900/50 border-r border-slate-200 dark:border-white/5 flex flex-col fixed left-0 top-0 backdrop-blur-xl z-20 transition-colors duration-300">
             {/* Logo */}
@@ -52,6 +54,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                     <span className="font-medium text-sm">Settings</span>
                 </button>
 
+                {/* Profile Section */}
+                <div className="pt-2 mt-2 border-t border-slate-200 dark:border-white/5">
+                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-white/5">
+                        <div className="shrink-0">
+                            <UserButton appearance={{
+                                elements: {
+                                    avatarBox: "w-8 h-8"
+                                }
+                            }} />
+                        </div>
+                        <div className="flex flex-col min-w-0 overflow-hidden">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                {user?.fullName || user?.firstName || 'User'}
+                            </span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                                {user?.primaryEmailAddress?.emailAddress}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </aside>
     );
