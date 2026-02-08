@@ -6,6 +6,7 @@ import { useChallenges } from '../hooks/useChallenges';
 import { TaskInput } from '../components/TaskInput';
 import { TaskModal } from '../components/TaskModal';
 import { Sidebar } from '../components/Sidebar';
+import { BottomNav } from '../components/BottomNav';
 import { format } from 'date-fns';
 import { Target } from 'lucide-react';
 
@@ -149,10 +150,19 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
     return (
         <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white selection:bg-cyan-500 selection:text-cyan-950 flex font-sans transition-colors duration-300">
             {/* Sidebar */}
-            <Sidebar currentView={currentView} onViewChange={(v) => setCurrentView(v as any)} />
+            <Sidebar
+                currentView={currentView}
+                onViewChange={(v) => setCurrentView(v as any)}
+            />
+
+            {/* Bottom Navigation (Mobile Only) */}
+            <BottomNav
+                currentView={currentView}
+                onViewChange={(v) => setCurrentView(v as any)}
+            />
 
             {/* Main Content */}
-            <main className="flex-1 ml-64 p-8 relative overflow-hidden">
+            <main className="flex-1 ml-0 md:ml-64 p-4 md:p-8 pb-32 md:pb-8 relative overflow-hidden">
                 {/* Background Ambience (Specific to Home) */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                     <div className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-600/10 dark:bg-purple-600/10 rounded-full blur-[100px] opacity-100 dark:opacity-100" />
@@ -163,16 +173,16 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
 
                 <div className="mx-auto max-w-full">
                     {/* Header Section */}
-                    <div className={`flex items-center justify-between ${currentView === 'disciplined' ? 'mb-8' : 'mb-6'}`}>
+                    <div className={`flex items-center justify-between ${currentView === 'disciplined' ? 'mb-6 md:mb-8' : 'mb-4 md:mb-6'}`}>
                         <div>
-                            <h1 className="text-4xl font-extrabold mb-1 bg-clip-text text-transparent bg-linear-to-r from-slate-900 dark:from-white to-slate-500 dark:to-slate-400">
+                            <h1 className="text-2xl md:text-4xl font-extrabold mb-1 bg-clip-text text-transparent bg-linear-to-r from-slate-900 dark:from-white to-slate-500 dark:to-slate-400">
                                 {currentView === 'my-day' && 'My Day'}
                                 {currentView === 'pomodoro' && 'Pomodoro Focus'}
                                 {currentView === 'planned' && 'Planned Tasks'}
                                 {currentView === 'disciplined' && 'Disciplined Protocol'}
                                 {currentView === 'settings' && 'Settings'}
                             </h1>
-                            <p className="text-slate-500 dark:text-slate-400">
+                            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
                                 {currentView === 'my-day'
                                     ? format(today, 'EEEE, MMMM do')
                                     : 'Overview of your schedule'

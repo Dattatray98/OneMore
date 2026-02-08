@@ -452,8 +452,8 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                             </div>
                         )}
 
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-22rem)]">
-                            <div className="lg:col-span-1 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 flex flex-col gap-4 overflow-hidden shadow-lg dark:shadow-none">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-auto lg:h-[calc(100vh-22rem)]">
+                            <div className="lg:col-span-1 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 h-80 lg:h-auto flex flex-col gap-4 overflow-hidden shadow-lg dark:shadow-none">
                                 <div className="flex-1 flex flex-col min-h-0">
                                     <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 px-1">Upcoming Schedule</h3>
                                     <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-1">
@@ -496,7 +496,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                 </div>
                             </div>
 
-                            <div className="lg:col-span-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-6 overflow-y-auto custom-scrollbar relative min-h-[500px] shadow-lg dark:shadow-none">
+                            <div className="lg:col-span-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 md:p-6 overflow-y-auto custom-scrollbar relative min-h-[500px] lg:min-h-0 h-auto lg:h-full shadow-lg dark:shadow-none">
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
                                         <h3 className="text-xl font-bold flex items-center gap-2 mb-1 text-slate-900 dark:text-white">

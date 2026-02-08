@@ -464,13 +464,13 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                            Displays Title, Date, and main Challenge Controls (Reset, Settings)
                         */}
                         <div className="md:col-span-12 space-y-6">
-                            <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 p-8 shadow-xl dark:shadow-2xl">
+                            <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 p-5 md:p-8 shadow-xl dark:shadow-2xl">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
 
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
                                     <div className="space-y-4">
                                         <div>
-                                            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{challenge.title}</h2>
+                                            <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">{challenge.title}</h2>
                                             {challenge.description && (
                                                 <p className="text-slate-500 dark:text-slate-400 max-w-xl text-lg leading-relaxed">{challenge.description}</p>
                                             )}

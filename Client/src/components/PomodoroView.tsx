@@ -637,7 +637,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in p-0">
             {/* Timer Section */}
             <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-[40px] p-12 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl dark:shadow-none">
+                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-[40px] p-6 md:p-12 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl dark:shadow-none">
                     <div className={`absolute inset-0 bg-linear-to-br ${mode === 'work' ? 'from-cyan-500/10 to-blue-600/10' : 'from-emerald-500/10 to-teal-600/10'} pointer-events-none opacity-40 dark:opacity-40`} />
 
 
@@ -730,7 +730,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                     )}
 
                     {/* Mode Status (Automatic) */}
-                    <div className="flex gap-1 mb-12 relative z-10">
+                    <div className="flex gap-1 mb-8 md:mb-12 relative z-10 w-full justify-center overflow-x-auto">
                         {(['work', 'shortBreak', 'longBreak'] as const).map((m) => {
                             const isDisabled = mode === 'work' && timeLeft > 0 && m !== 'work';
                             const isActiveMode = mode === m;
@@ -739,7 +739,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                                     key={m}
                                     onClick={() => handleManualSwitch(m)}
                                     disabled={isDisabled}
-                                    className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all border ${isActiveMode
+                                    className={`px-3 py-1 md:px-6 md:py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all border whitespace-nowrap ${isActiveMode
                                         ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-lg'
                                         : 'bg-transparent text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-900 dark:hover:text-slate-300'
                                         } ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
@@ -751,8 +751,23 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                     </div>
 
                     {/* Timer Circle */}
-                    <div className="relative mb-8 group">
-                        <svg className="w-64 h-64 transform -rotate-90">
+                    <div className="relative mb-8 group flex items-center justify-center">
+                        <svg className="w-48 h-48 md:w-64 md:h-64 transform -rotate-90">
+                            <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-100 dark:text-white/5" />
+                            <circle
+                                cx="50%"
+                                cy="50%"
+                                r="45%"
+                                stroke="currentColor"
+                                strokeWidth="8"
+                                fill="transparent"
+                                strokeDasharray={2 * Math.PI * (window.innerWidth < 768 ? 90 : 120)} // Approximate radius logic if using pixels, but here we used % so cleaner to keep pixel consistent or react to size. 
+                            // Actually, standard SVG scaling is easier if we keep viewbox. 
+                            // Let's simplify: Use viewBox="0 0 256 256" and keep original logic but scale via className w/h
+                            />
+                        </svg>
+                        {/* RE-RENDERING SVG WITH VIEWBOX FOR RESPONSIVENESS */}
+                        <svg className="absolute w-48 h-48 md:w-64 md:h-64 transform -rotate-90" viewBox="0 0 256 256">
                             <circle cx="128" cy="128" r="120" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-100 dark:text-white/5" />
                             <circle
                                 cx="128"
@@ -767,20 +782,20 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                                 strokeLinecap="round"
                             />
                         </svg>
+
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-7xl font-black text-slate-900 dark:text-white font-mono tracking-tighter drop-shadow-2xl">
+                            <span className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white font-mono tracking-tighter drop-shadow-2xl">
                                 {formatTime(timeLeft)}
                             </span>
-                            <div className="flex items-center gap-2 mt-4 px-4 py-1.5 bg-slate-50 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/5">
+                            <div className="flex items-center gap-2 mt-2 md:mt-4 px-3 py-1 md:px-4 md:py-1.5 bg-slate-50 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/5">
                                 <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                <span className="text-[8px] md:text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                     {mode === 'work' ? `Session #${sessionCount + 1}` : 'Break Period'}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Timer Controls */}
                     {/* Timer Controls */}
                     <div className="flex items-center gap-6 relative z-10">
                         <button
@@ -793,7 +808,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
 
                         <button
                             onClick={toggleTimer}
-                            className={`w-20 h-20 flex items-center justify-center rounded-full transition-all border-2 cursor-pointer ${isActive
+                            className={`w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full transition-all border-2 cursor-pointer ${isActive
                                 ? 'border-slate-900 bg-slate-900 dark:border-white dark:bg-white text-white dark:text-slate-950 shadow-xl'
                                 : 'border-slate-200 bg-transparent text-slate-900 hover:border-slate-400 dark:border-white/20 dark:text-white dark:hover:border-white/50'
                                 }`}
@@ -990,7 +1005,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
                     </div>
                 </div>
             </div>
-// Import Selection Modal
+    // Import Selection Modal
             {
                 importModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-8 bg-slate-950/40 dark:bg-black/60 backdrop-blur-sm animate-fade-in text-left">
