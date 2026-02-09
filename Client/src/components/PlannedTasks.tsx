@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Task, Challenge, HistoryRecord } from '../types';
-import { Calendar as CalendarIcon, ChevronRight, Plus, Check, Target, Trash2, Edit2, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronRight, Plus, Check, Target, Trash2, Edit2, TrendingUp, ArrowUpRight, MoreVertical, X, Clock } from 'lucide-react';
 import { format, isSameDay, differenceInDays, parseISO } from 'date-fns';
 import { TaskModal } from './TaskModal';
 import { ChallengeCreationModal } from './ChallengeCreationModal';
@@ -309,25 +309,25 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
     return (
         <>
-            <div className="w-full flex flex-col gap-6 animate-fade-in">
-                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/10 pb-4">
+            <div className="w-full flex flex-col gap-4 md:gap-6 animate-fade-in pb-20 md:pb-0">
+                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/10 pb-4 overflow-x-auto hide-scrollbar whitespace-nowrap">
                     <button
                         onClick={() => setViewMode('week')}
-                        className={`text-sm font-medium transition-colors dark:hover:text-white hover:text-slate-900 cursor-pointer ${viewMode === 'week' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-500'}`}
+                        className={`text-sm font-medium transition-colors dark:hover:text-white hover:text-slate-900 cursor-pointer shrink-0 ${viewMode === 'week' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-500'}`}
                     >
                         Plan Overview
                     </button>
-                    <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
+                    <div className="h-4 w-px bg-slate-200 dark:bg-white/10 shrink-0" />
                     <button
                         onClick={() => setViewMode('day')}
-                        className={`text-sm font-medium transition-colors dark:hover:text-white hover:text-slate-900 cursor-pointer ${viewMode === 'day' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-500'}`}
+                        className={`text-sm font-medium transition-colors dark:hover:text-white hover:text-slate-900 cursor-pointer shrink-0 ${viewMode === 'day' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-500'}`}
                     >
                         Day Planner
                     </button>
                     {activeChallenge && (
                         <>
-                            <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
-                            <div className="flex items-center gap-2 px-3 py-1 bg-cyan-500/10 rounded-full border border-cyan-500/20">
+                            <div className="h-4 w-px bg-slate-200 dark:bg-white/10 shrink-0" />
+                            <div className="flex items-center gap-2 px-3 py-1 bg-cyan-500/10 rounded-full border border-cyan-500/20 shrink-0">
                                 <Target size={12} className="text-cyan-400" />
                                 <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">{activeChallenge.title} Active</span>
                             </div>
@@ -405,7 +405,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                     <div className="flex flex-col gap-6">
                         {/* Horizontal Protocol Header */}
                         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-3 shadow-sm dark:shadow-none">
-                            <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar no-scrollbar pb-1">
+                            <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-1">
                                 <button
                                     onClick={() => setTaskTypeFilter('normal')}
                                     className={`shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer ${taskTypeFilter === 'normal' ? 'bg-cyan-600 dark:bg-cyan-500/10 border-cyan-700 dark:border-cyan-500/30 text-white dark:text-cyan-400 shadow-lg shadow-cyan-500/20' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
@@ -439,20 +439,20 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                         </div>
 
                         {activeChallenge && taskTypeFilter === 'disciplined' && (
-                            <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 flex items-center gap-8 animate-fade-in shadow-xl dark:shadow-black/20">
+                            <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-2xl p-4 md:px-6 md:py-4 flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-8 animate-fade-in shadow-xl dark:shadow-black/20">
                                 <div className="flex-1">
                                     <div className="flex justify-between items-end mb-2">
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col min-w-0">
                                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Current Protocol Focus</span>
                                             <button
                                                 onClick={() => onViewChange('disciplined')}
-                                                className="group flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white leading-none hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors text-left cursor-pointer"
+                                                className="group flex items-center gap-2 text-base md:text-lg font-bold text-slate-900 dark:text-white leading-none hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors text-left cursor-pointer truncate"
                                             >
-                                                {activeChallenge.title}
-                                                <ArrowUpRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity text-cyan-600 dark:text-cyan-400" />
+                                                <span className="truncate">{activeChallenge.title}</span>
+                                                <ArrowUpRight size={16} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-cyan-600 dark:text-cyan-400" />
                                             </button>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-right shrink-0 ml-4">
                                             <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest block mb-1">Success Velocity</span>
                                             <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{Math.round((activeChallenge.completedDays.length / activeChallenge.days) * 100)}%</span>
                                         </div>
@@ -464,18 +464,18 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="w-px h-12 bg-slate-200 dark:bg-white/10 hidden sm:block" />
-                                <div className="hidden sm:flex flex-col items-center justify-center shrink-0 min-w-[80px]">
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Time Elapsed</span>
+                                <div className="w-full h-px md:w-px md:h-12 bg-slate-200 dark:bg-white/10" />
+                                <div className="flex flex-row md:flex-col items-center justify-between md:justify-center shrink-0 md:min-w-[80px]">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0 md:mb-1">Time Elapsed</span>
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-slate-900 dark:text-white">{Math.max(0, differenceInDays(selectedDate, parseISO(activeChallenge.startDate)) + 1)}</span>
+                                        <span className="text-xl md:text-3xl font-black text-slate-900 dark:text-white">{Math.max(0, differenceInDays(selectedDate, parseISO(activeChallenge.startDate)) + 1)}</span>
                                         <span className="text-xs font-bold text-slate-400 dark:text-slate-600 uppercase">/ {activeChallenge.days}</span>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-auto lg:h-[calc(100vh-22rem)]">
+                        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 h-auto lg:h-[calc(100vh-22rem)]">
                             <div className="lg:col-span-1 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 h-80 lg:h-auto flex flex-col gap-4 overflow-hidden shadow-lg dark:shadow-none">
                                 <div className="flex-1 flex flex-col min-h-0">
                                     <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 px-1">Upcoming Schedule</h3>
@@ -519,34 +519,35 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                 </div>
                             </div>
 
-                            <div className="lg:col-span-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 md:p-6 overflow-y-auto custom-scrollbar relative min-h-[500px] lg:min-h-0 h-auto lg:h-full shadow-lg dark:shadow-none">
-                                <div className="flex items-center justify-between mb-8">
+                            <div className="lg:col-span-3 bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/10 p-4 md:p-6 overflow-y-auto custom-scrollbar relative min-h-[400px] lg:min-h-0 h-auto lg:h-full shadow-lg dark:shadow-none">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
                                     <div>
-                                        <h3 className="text-xl font-bold flex items-center gap-2 mb-1 text-slate-900 dark:text-white">
-                                            <CalendarIcon size={24} className="text-cyan-600 dark:text-cyan-400" />
+                                        <h3 className="text-lg md:text-xl font-bold flex items-center gap-2 mb-1 text-slate-900 dark:text-white">
+                                            <CalendarIcon size={20} className="md:w-6 md:h-6 text-cyan-600 dark:text-cyan-400" />
                                             {format(selectedDate, 'EEEE')}
                                         </h3>
-                                        <p className="text-slate-500 dark:text-slate-400 ml-8">{format(selectedDate, 'MMM do, yyyy')}</p>
+                                        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 ml-7 md:ml-8">{format(selectedDate, 'MMM do, yyyy')}</p>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 self-end sm:self-auto">
                                         <div className="hidden sm:flex flex-col items-end mr-2">
                                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Plan</span>
                                             <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">{taskTypeFilter === 'normal' ? 'Manual Schedule' : activeChallenge?.title}</span>
                                         </div>
                                         <button
                                             onClick={() => handleAddTask(format(selectedDate, 'yyyy-MM-dd'))}
-                                            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/20 font-medium text-sm cursor-pointer"
+                                            className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/20 font-medium text-xs md:text-sm cursor-pointer"
                                         >
-                                            <Plus size={16} />
+                                            <Plus size={14} className="md:w-4 md:h-4" />
                                             Add Task
                                         </button>
                                         {onNavigateToPomodoro && (
                                             <button
                                                 onClick={() => onNavigateToPomodoro(getDayTasks(selectedDate))}
-                                                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:border-cyan-500/30 rounded-lg transition-all font-medium text-sm cursor-pointer"
+                                                className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 hover:border-cyan-500/30 rounded-lg transition-all font-medium text-xs md:text-sm cursor-pointer"
                                             >
-                                                <Target size={16} className="text-cyan-600 dark:text-cyan-400" />
-                                                Start Focus
+                                                <Target size={14} className="md:w-4 md:h-4 text-cyan-600 dark:text-cyan-400" />
+                                                <span className="hidden sm:inline">Start Focus</span>
+                                                <span className="sm:hidden">Focus</span>
                                             </button>
                                         )}
                                     </div>
@@ -560,22 +561,14 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                             <div className="flex flex-col space-y-3">
                                                 {dayTasks.length > 0 ? (
                                                     dayTasks.map(task => (
-                                                        <div key={task.id} className="flex gap-4 group">
-                                                            <div className="w-[70px] text-right pt-3 shrink-0">
-                                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                                                                    {task.scheduledTime ? format(new Date(`2000-01-01T${task.scheduledTime}`), 'h:mm a') : 'Anytime'}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <TimelineTaskItem
-                                                                    task={task}
-                                                                    onEdit={handleEditTask}
-                                                                    onToggle={handleToggleTask}
-                                                                    onDelete={handleDeleteTask}
-                                                                    isEditable={isSameDay(selectedDate, effectiveToday)}
-                                                                />
-                                                            </div>
-                                                        </div>
+                                                        <TimelineTaskItem
+                                                            key={task.id}
+                                                            task={task}
+                                                            onEdit={handleEditTask}
+                                                            onToggle={handleToggleTask}
+                                                            onDelete={handleDeleteTask}
+                                                            isEditable={isSameDay(selectedDate, effectiveToday)}
+                                                        />
                                                     ))
                                                 ) : (
                                                     <div className="flex flex-col items-center justify-center py-20 opacity-40">
@@ -599,7 +592,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                         </div>
                     </div>
                 )}
-            </div >
+            </div>
 
             <TaskModal
                 isOpen={isModalOpen}
@@ -630,58 +623,87 @@ const TimelineTaskItem: React.FC<{
     isEditable: boolean;
 }> = ({ task, onEdit, onToggle, onDelete, isEditable }) => {
     const isProtocol = !!(task as any).isProtocol;
+    const [showMenu, setShowMenu] = useState(false);
+
     return (
         <div
-            className={`flex items-center gap-3 p-3 rounded-xl border backdrop-blur-sm transition-all group/item ${task.completed
+            className={`relative flex items-center gap-3 p-3 rounded-xl border backdrop-blur-sm transition-all group/item ${task.completed
                 ? 'bg-slate-100/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700/50 opacity-60 shadow-none'
                 : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-cyan-500/30 hover:bg-slate-50 dark:hover:bg-white/10 shadow-sm hover:shadow-lg transition-all duration-300'
                 }`}
         >
-            <div className="flex-1 min-w-0" onClick={() => onEdit(task)}>
-                <div className="flex items-center gap-2">
-                    <h4 className={`text-sm font-bold truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-200'}`}>
-                        {task.text}
-                    </h4>
-                    {isProtocol && (
-                        <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 rounded border border-cyan-200 dark:border-cyan-500/20 uppercase tracking-tighter">Protocol</span>
-                    )}
+            {showMenu ? (
+                <div className="flex-1 flex items-center justify-between animate-fade-in">
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onEdit(task); setShowMenu(false); }}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-white/10 hover:bg-cyan-500 hover:text-white text-slate-600 dark:text-slate-300 rounded-lg transition-colors text-xs font-bold"
+                        >
+                            <Edit2 size={14} />
+                            Edit
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onDelete(task.id); setShowMenu(false); }}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-500 hover:text-white text-red-600 dark:text-red-400 rounded-lg transition-colors text-xs font-bold"
+                        >
+                            <Trash2 size={14} />
+                            Delete
+                        </button>
+                    </div>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setShowMenu(false); }}
+                        className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                    >
+                        <X size={16} />
+                    </button>
                 </div>
-                {task.scheduledTime && (
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                        {format(new Date(`2000-01-01T${task.scheduledTime}`), 'h:mm a')}
-                    </span>
-                )}
-            </div>
+            ) : (
+                <>
+                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onEdit(task)}>
+                        <div className="flex items-center gap-2 mb-1">
+                            {task.scheduledTime ? (
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-cyan-600 dark:text-cyan-400 font-mono bg-cyan-50 dark:bg-cyan-500/10 px-1.5 py-0.5 rounded-md border border-cyan-100 dark:border-cyan-500/20">
+                                    <Clock size={10} />
+                                    {format(new Date(`2000-01-01T${task.scheduledTime}`), 'h:mm a')}
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-white/5">
+                                    <Clock size={10} />
+                                    Anytime
+                                </span>
+                            )}
+                            {isProtocol && (
+                                <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-500/20 uppercase tracking-tighter">Protocol</span>
+                            )}
+                        </div>
+                        <h4 className={`text-sm font-bold truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-200'}`}>
+                            {task.text}
+                        </h4>
+                    </div>
 
-            <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                <button
-                    onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition-colors"
-                    title="Edit Task"
-                >
-                    <Edit2 size={14} />
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
-                    title="Delete Task"
-                >
-                    <Trash2 size={14} />
-                </button>
-                <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1" />
-                <button
-                    onClick={(e) => { e.stopPropagation(); isEditable && onToggle(task.id); }}
-                    disabled={!isEditable}
-                    className={`p-2 rounded-lg border transition-all ${task.completed
-                        ? 'bg-emerald-500 border-emerald-500 text-white dark:text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                        : isEditable
-                            ? 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500 shadow-sm'
-                            : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed'
-                        }`}
-                >
-                    <Check size={16} strokeWidth={3} />
-                </button>
-            </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowMenu(true); }}
+                            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors opacity-100 md:opacity-0 group-hover/item:opacity-100"
+                        >
+                            <MoreVertical size={16} />
+                        </button>
+                        <div className="w-px h-6 bg-slate-200 dark:bg-white/10" />
+                        <button
+                            onClick={(e) => { e.stopPropagation(); isEditable && onToggle(task.id); }}
+                            disabled={!isEditable}
+                            className={`p-2 rounded-lg border transition-all ${task.completed
+                                ? 'bg-emerald-500 border-emerald-500 text-white dark:text-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                                : isEditable
+                                    ? 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500 shadow-sm'
+                                    : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                                }`}
+                        >
+                            <Check size={16} strokeWidth={3} />
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

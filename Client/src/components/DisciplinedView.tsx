@@ -360,7 +360,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
     const isEditable = selectedDay === todayIndex;
 
     return (
-        <div className="animate-fade-in max-w-full space-y-8 relative pb-20">
+        <div className="animate-fade-in max-w-full space-y-4 md:space-y-8 relative pb-4 md:pb-20">
             {isCreating ? (
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm max-w-2xl mx-auto shadow-2xl dark:shadow-none">
                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-white">
@@ -494,7 +494,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                            Displays Title, Date, and main Challenge Controls (Reset, Settings)
                         */}
                         <div className="md:col-span-12 space-y-6">
-                            <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 p-5 md:p-8 shadow-xl dark:shadow-2xl">
+                            <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 p-4 md:p-8 shadow-xl dark:shadow-2xl">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
 
                                 <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
@@ -550,32 +550,32 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                SECTION 2: STATS DASHBOARD
                                Three cards showing high-level progress metrics.
                             */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none">
-                                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
-                                        <Trophy className="text-cyan-600 dark:text-cyan-400" size={24} />
+                            <div className="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto pb-4 md:pb-0 snap-x hide-scrollbar">
+                                <div className="min-w-[160px] md:min-w-0 snap-center bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 shadow-sm dark:shadow-none">
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 mb-1 md:mb-0">
+                                        <Trophy className="text-cyan-600 dark:text-cyan-400" size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Completed</p>
-                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.completed} <span className="text-sm font-normal text-slate-500">Days</span></p>
+                                        <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Completed</p>
+                                        <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stats.completed} <span className="text-xs md:text-sm font-normal text-slate-500">Days</span></p>
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none">
-                                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                                        <BarChart3 className="text-purple-600 dark:text-purple-400" size={24} />
+                                <div className="min-w-[160px] md:min-w-0 snap-center bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 shadow-sm dark:shadow-none">
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 mb-1 md:mb-0">
+                                        <BarChart3 className="text-purple-600 dark:text-purple-400" size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Consistency</p>
-                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.consistency}% <span className="text-sm font-normal text-slate-500">Success</span></p>
+                                        <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Consistency</p>
+                                        <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stats.consistency}% <span className="text-xs md:text-sm font-normal text-slate-500">Success</span></p>
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm dark:shadow-none">
-                                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                        <TrendingUp className="text-emerald-600 dark:text-emerald-400" size={24} />
+                                <div className="min-w-[160px] md:min-w-0 snap-center bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4 shadow-sm dark:shadow-none">
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 mb-1 md:mb-0">
+                                        <TrendingUp className="text-emerald-600 dark:text-emerald-400" size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Left to Win</p>
-                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.daysLeft} <span className="text-sm font-normal text-slate-500">Days</span></p>
+                                        <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-wider">Left to Win</p>
+                                        <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stats.daysLeft} <span className="text-xs md:text-sm font-normal text-slate-500">Days</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -589,7 +589,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
 
                         {/* Edit Mode Panel */}
                         {isEditing && (
-                            <div className="md:col-span-12 mb-2 p-8 bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-cyan-500/20 rounded-3xl animate-fade-in shadow-2xl z-20 backdrop-blur-xl">
+                            <div className="md:col-span-12 mb-2 p-4 md:p-8 bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-cyan-500/20 rounded-3xl animate-fade-in shadow-2xl z-20 backdrop-blur-xl">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div className="space-y-2">
                                         <label className="block text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest">Challenge Name</label>
@@ -718,7 +718,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                         <div className="md:col-span-5 flex flex-col gap-6">
                             {/* Selected Day Card */}
                             {selectedDay && (
-                                <div className={`bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-xl dark:shadow-none h-full flex flex-col relative overflow-hidden group transition-all duration-300 ${!isEditable ? 'opacity-90 grayscale-[0.3]' : ''}`}>
+                                <div className={`bg-white dark:bg-linear-to-br dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-white/10 rounded-3xl p-4 md:p-6 shadow-xl dark:shadow-none h-full flex flex-col relative overflow-hidden group transition-all duration-300 ${!isEditable ? 'opacity-90 grayscale-[0.3]' : ''}`}>
                                     {/* Background decorative glow */}
                                     <div className="absolute top-0 right-0 w-full h-full bg-linear-to-b from-cyan-500/5 to-transparent pointer-events-none" />
 
@@ -774,7 +774,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                     </div>
 
                                     {challenge.dailyRoutine.length > 0 ? (
-                                        <div className="space-y-3 flex-1 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
+                                        <div className="space-y-2 md:space-y-3 flex-1 overflow-y-auto max-h-[280px] md:max-h-[400px] pr-2 custom-scrollbar">
                                             {challenge.dailyRoutine.map((task, idx) => {
                                                 const addedOn = task.addedOnDay || 1;
                                                 const removedOn = task.removedOnDay || Infinity;
@@ -787,7 +787,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                                     <div
                                                         key={task.id}
                                                         onClick={() => isEditable && toggleRoutineTask(selectedDay, idx)}
-                                                        className={`relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-300 group/item ${isEditable ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'
+                                                        className={`relative flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl border-2 transition-all duration-300 group/item ${isEditable ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'
                                                             } ${isDone
                                                                 ? 'bg-cyan-500/10 border-cyan-500/30 dark:shadow-[0_4px_20px_-10px_rgba(34,211,238,0.4)] shadow-sm'
                                                                 : 'bg-white dark:bg-white/2 border-slate-100 dark:border-transparent ' + (isEditable ? 'hover:bg-slate-50 dark:hover:bg-white/5 hover:border-slate-200 dark:hover:border-white/10 hover:shadow-md' : '')
@@ -836,9 +836,9 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                         <div className="md:col-span-7 flex flex-col gap-6">
 
                             {/* SECTION 4a: ADVANCED ANALYTICS DASHBOARD */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 snap-x hide-scrollbar order-2 md:order-1">
                                 {/* 1. Full Challenge Progress (Circle) */}
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center gap-4 shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
+                                <div className="min-w-[85vw] sm:min-w-[300px] md:min-w-0 snap-center shrink-0 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center gap-4 shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
                                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Challenge Progress</h4>
                                     <div className="relative w-32 h-32 flex items-center justify-center">
                                         <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
@@ -869,7 +869,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                 </div>
 
                                 {/* 2. Daily Protocol Progress (Circle) */}
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center gap-4 shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
+                                <div className="min-w-[85vw] sm:min-w-[300px] md:min-w-0 snap-center shrink-0 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-6 flex flex-col items-center justify-center gap-4 shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
                                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Day {selectedDay} Protocol</h4>
                                     <div className="relative w-32 h-32 flex items-center justify-center">
                                         {(() => {
@@ -931,7 +931,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                 </div>
 
                                 {/* 3. Habit Leaderboard (Data representation) */}
-                                <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-6 flex flex-col shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
+                                <div className="min-w-[85vw] sm:min-w-[300px] md:min-w-0 snap-center shrink-0 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-white/5 rounded-3xl p-4 md:p-6 flex flex-col shadow-lg dark:shadow-none backdrop-blur-md min-h-[220px]">
                                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center justify-between">
                                         <span>Habit Leaderboard</span>
                                         <TrendingUp size={12} className="text-emerald-600 dark:text-emerald-500" />
@@ -971,7 +971,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                             </div>
 
                             {/* 4b. Progress Map (Grid) */}
-                            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl dark:shadow-none backdrop-blur-sm flex flex-col">
+                            <div className="order-1 md:order-2 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl p-4 md:p-6 shadow-xl dark:shadow-none backdrop-blur-sm flex flex-col">
                                 <div className="flex items-center justify-between mb-6">
                                     <h4 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                                         <Calendar size={20} className="text-slate-400 dark:text-slate-500" />
@@ -984,7 +984,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
 
 
 
-                                <div className="grid grid-cols-8 sm:grid-cols-12 gap-3">
+                                <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 gap-2 md:gap-3">
                                     {Array.from({ length: challenge.days }, (_, i) => i + 1).map((day) => {
                                         const styleClass = getProgressStyle(day);
                                         const isSelected = selectedDay === day;
@@ -1025,7 +1025,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                             </div>
 
                             {/* 4c. Recent Activity (History) */}
-                            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl p-6 shadow-xl dark:shadow-none backdrop-blur-sm flex flex-col min-h-[300px]">
+                            <div className="order-3 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-3xl p-4 md:p-6 shadow-xl dark:shadow-none backdrop-blur-sm flex flex-col min-h-[300px]">
                                 <div className="flex items-center justify-between mb-6">
                                     <h4 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
                                         <TrendingUp size={20} className="text-slate-400 dark:text-slate-500" />
