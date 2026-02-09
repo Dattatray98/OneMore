@@ -29,6 +29,8 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
     const [editRefreshTime, setEditRefreshTime] = useState('');
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
+    const [editNewTask, setEditNewTask] = useState('');
+    const [editNewTaskTime, setEditNewTaskTime] = useState('');
 
     // Derived State for Current Day
     // Derived State for Current Day (Respecting Refresh Time)
@@ -118,8 +120,16 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
         }
 
         // 1. Get current progress for this day (or init if empty)
-        const currentDayProgress = challenge.dailyProgress[day] || new Array(challenge.dailyRoutine.length).fill(false);
+        // Note: We use dailyRoutine.length to ensure we can cover all potential tasks, but we only really care about visible ones.
+        const currentDayProgress = challenge.dailyProgress[day] || [];
         const newDayProgress = [...currentDayProgress];
+
+        // Ensure array is long enough if we are toggling a high index (though for visible tasks loop this is usually fine)
+        if (newDayProgress.length <= taskIndex) {
+            for (let i = newDayProgress.length; i <= taskIndex; i++) {
+                newDayProgress[i] = false;
+            }
+        }
 
         // 2. Toggle the specific task
         newDayProgress[taskIndex] = !newDayProgress[taskIndex];
@@ -130,11 +140,19 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
             [day]: newDayProgress
         };
 
-        // 4. Check if ALL tasks for the day are now done
-        const allTasksCompleted = newDayProgress.length === challenge.dailyRoutine.length && newDayProgress.every(done => done);
+        // 4. Check if ALL VISIBLE tasks for the day are done
+        const allTasksCompleted = challenge.dailyRoutine.every((task, idx) => {
+            const addedOn = task.addedOnDay || 1;
+            const removedOn = task.removedOnDay || Infinity;
+            const isVisible = day >= addedOn && day < removedOn;
+
+            if (!isVisible) return true; // Task doesn't apply to this day, so it counts as "done" (or irrelevant)
+
+            // Check if the boolean at this index is true
+            return newDayProgress[idx] === true;
+        });
 
         // 5. Update "Completed Days" list (The Green Streak)
-        // If all done, add day to list. If not, remove it.
         let newCompletedDays = challenge.completedDays;
         if (allTasksCompleted) {
             if (!newCompletedDays.includes(day)) newCompletedDays = [...newCompletedDays, day];
@@ -227,8 +245,20 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
 
         // Calculate % complete for the day
         const progress = challenge.dailyProgress[day] || [];
-        const completedCount = progress.filter(Boolean).length;
-        const totalCount = challenge.dailyRoutine.length;
+
+        let completedCount = 0;
+        let totalCount = 0;
+
+        challenge.dailyRoutine.forEach((task, idx) => {
+            const addedOn = task.addedOnDay || 1;
+            const removedOn = task.removedOnDay || Infinity;
+            const isVisible = day >= addedOn && day < removedOn;
+
+            if (isVisible) {
+                totalCount++;
+                if (progress[idx]) completedCount++;
+            }
+        });
 
         if (totalCount === 0) return 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-700 dark:text-slate-400';
 
@@ -553,6 +583,10 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
 
 
 
+
+
+
+
                         {/* Edit Mode Panel */}
                         {isEditing && (
                             <div className="md:col-span-12 mb-2 p-8 bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-cyan-500/20 rounded-3xl animate-fade-in shadow-2xl z-20 backdrop-blur-xl">
@@ -588,6 +622,73 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                             rows={2}
                                             className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500/50 resize-none"
                                         />
+                                    </div>
+
+                                    {/* Add New Task Section */}
+                                    <div className="md:col-span-2 border-t border-slate-200 dark:border-white/10 pt-4 mt-2">
+                                        <label className="block text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest mb-3">Add New Routine Task (Effective from Today)</label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={editNewTask}
+                                                onChange={(e) => setEditNewTask(e.target.value)}
+                                                placeholder="New task..."
+                                                className="flex-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500/50 text-sm"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        // Helper to add task immediately to state (queued for save)
+                                                        // But saveSettings handles saving.
+                                                        // We actually need to update the challenge state directly or via the save function?
+                                                        // SaveSettings builds a history. We should probably add the task to the queue there or modify onUpdateChallenge.
+                                                        // Actually, let's just make a specific "Add Task" button that commits immediately or adds to the `challenge` object in memory.
+                                                        // But `challenge` prop is immutable from here.
+
+                                                        // Wait, `saveSettings` uses `editTitle` etc.
+                                                        // Adding a task is a structural change.
+                                                        // Let's Handle it separately or include it in `saveSettings`.
+                                                        // Re-implementing logic inline here for simplicity given the constraints:
+                                                    }
+                                                }}
+                                            />
+                                            <input
+                                                type="time"
+                                                value={editNewTaskTime}
+                                                onChange={(e) => setEditNewTaskTime(e.target.value)}
+                                                className="w-32 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-cyan-500/50 text-sm dark:scheme-dark"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (!editNewTask.trim()) return;
+                                                    const newTaskObj = {
+                                                        id: crypto.randomUUID(),
+                                                        text: editNewTask.trim(),
+                                                        time: editNewTaskTime || undefined,
+                                                        addedOnDay: todayIndex // Effective from today!
+                                                    };
+
+                                                    // Immediately update the challenge with the new task
+                                                    onUpdateChallenge({
+                                                        ...challenge,
+                                                        dailyRoutine: [...challenge.dailyRoutine, newTaskObj],
+                                                        history: [{
+                                                            id: crypto.randomUUID(),
+                                                            type: 'add',
+                                                            taskId: newTaskObj.id,
+                                                            taskText: newTaskObj.text,
+                                                            timestamp: Date.now(),
+                                                            details: `Added new task from Day ${todayIndex}`
+                                                        }, ...(challenge.history || [])]
+                                                    });
+                                                    setEditNewTask('');
+                                                    setEditNewTaskTime('');
+                                                }}
+                                                className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl font-bold text-sm transition-colors border border-emerald-500/20"
+                                            >
+                                                Add Task
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex gap-3 w-full md:w-auto">
@@ -641,8 +742,23 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                         </div>
                                         <div className="text-right flex flex-col items-end gap-2">
                                             <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                                                {challenge.dailyProgress[selectedDay]?.filter(Boolean).length || 0}
-                                                <span className="text-lg text-slate-400 dark:text-slate-500 font-medium">/{challenge.dailyRoutine.length}</span>
+                                                {(() => {
+                                                    const progress = challenge.dailyProgress[selectedDay] || [];
+                                                    let completedCount = 0;
+                                                    let totalCount = 0;
+                                                    challenge.dailyRoutine.forEach((t, i) => {
+                                                        const visible = selectedDay >= (t.addedOnDay || 1) && selectedDay < (t.removedOnDay || Infinity);
+                                                        if (visible) {
+                                                            totalCount++;
+                                                            if (progress[i]) completedCount++;
+                                                        }
+                                                    });
+                                                    return `${completedCount}`;
+                                                })()}
+                                                <span className="text-lg text-slate-400 dark:text-slate-500 font-medium">/{(() => {
+                                                    const totalCount = challenge.dailyRoutine.filter(t => selectedDay >= (t.addedOnDay || 1) && selectedDay < (t.removedOnDay || Infinity)).length;
+                                                    return totalCount;
+                                                })()}</span>
                                             </div>
                                             {onNavigateToPlanner && (
                                                 <button
@@ -660,6 +776,12 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                     {challenge.dailyRoutine.length > 0 ? (
                                         <div className="space-y-3 flex-1 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
                                             {challenge.dailyRoutine.map((task, idx) => {
+                                                const addedOn = task.addedOnDay || 1;
+                                                const removedOn = task.removedOnDay || Infinity;
+                                                const isVisible = selectedDay >= addedOn && selectedDay < removedOn;
+
+                                                if (!isVisible) return null;
+
                                                 const isDone = challenge.dailyProgress[selectedDay]?.[idx] || false;
                                                 return (
                                                     <div
@@ -751,8 +873,16 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Day {selectedDay} Protocol</h4>
                                     <div className="relative w-32 h-32 flex items-center justify-center">
                                         {(() => {
-                                            const done = challenge.dailyProgress[selectedDay || 0]?.filter(Boolean).length || 0;
-                                            const total = challenge.dailyRoutine.length;
+                                            const total = challenge.dailyRoutine.filter(t => (selectedDay || 0) >= (t.addedOnDay || 1) && (selectedDay || 0) < (t.removedOnDay || Infinity)).length;
+                                            const done = (() => {
+                                                const progress = challenge.dailyProgress[selectedDay || 0] || [];
+                                                let c = 0;
+                                                challenge.dailyRoutine.forEach((t, i) => {
+                                                    const visible = (selectedDay || 0) >= (t.addedOnDay || 1) && (selectedDay || 0) < (t.removedOnDay || Infinity);
+                                                    if (visible && progress[i]) c++;
+                                                });
+                                                return c;
+                                            })();
                                             const percent = total > 0 ? done / total : 0;
                                             return (
                                                 <>
@@ -784,7 +914,19 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                         })()}
                                     </div>
                                     <p className="text-xs text-slate-400 font-medium">
-                                        {challenge.dailyProgress[selectedDay || 0]?.filter(Boolean).length || 0} / {challenge.dailyRoutine.length} Completed
+                                        {(() => {
+                                            const total = challenge.dailyRoutine.filter(t => (selectedDay || 0) >= (t.addedOnDay || 1) && (selectedDay || 0) < (t.removedOnDay || Infinity)).length;
+                                            const done = (() => {
+                                                const progress = challenge.dailyProgress[selectedDay || 0] || [];
+                                                let c = 0;
+                                                challenge.dailyRoutine.forEach((t, i) => {
+                                                    const visible = (selectedDay || 0) >= (t.addedOnDay || 1) && (selectedDay || 0) < (t.removedOnDay || Infinity);
+                                                    if (visible && progress[i]) c++;
+                                                });
+                                                return c;
+                                            })();
+                                            return `${done} / ${total}`;
+                                        })()} Completed
                                     </p>
                                 </div>
 

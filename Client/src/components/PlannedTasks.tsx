@@ -144,17 +144,17 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                     history: [newHistory, ...(activeChallenge.history || [])]
                 });
             } else {
+                const diff = differenceInDays(selectedDate, parseISO(activeChallenge.startDate)) + 1;
                 const newRoutineItem = {
                     id: crypto.randomUUID(),
                     text: taskData.text || 'Untitled Protocol',
-                    time: taskData.scheduledTime
+                    time: taskData.scheduledTime,
+                    addedOnDay: Math.max(1, diff)
                 };
                 const updatedRoutine = [...activeChallenge.dailyRoutine, newRoutineItem];
 
                 const updatedProgress = { ...activeChallenge.dailyProgress };
-                Object.keys(updatedProgress).forEach(day => {
-                    updatedProgress[Number(day)] = [...updatedProgress[Number(day)], false];
-                });
+
 
                 const newHistory: HistoryRecord = {
                     id: crypto.randomUUID(),
@@ -162,7 +162,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                     taskId: newRoutineItem.id,
                     taskText: newRoutineItem.text,
                     timestamp: Date.now(),
-                    details: `New global task: "${newRoutineItem.text}" scheduled for ${newRoutineItem.time || 'Anytime'}`
+                    details: `New global task: "${newRoutineItem.text}" scheduled for ${newRoutineItem.time || 'Anytime'} (Effective Day ${newRoutineItem.addedOnDay}+)`
                 };
 
                 onUpdateChallenge({
@@ -197,10 +197,26 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
             const currentDayProgress = activeChallenge.dailyProgress[diff] || new Array(activeChallenge.dailyRoutine.length).fill(false);
             const newDayProgress = [...currentDayProgress];
+
+            // Ensure progress array is large enough for current routine
+            if (newDayProgress.length < activeChallenge.dailyRoutine.length) {
+                for (let i = newDayProgress.length; i < activeChallenge.dailyRoutine.length; i++) {
+                    newDayProgress.push(false);
+                }
+            }
             newDayProgress[idx] = !newDayProgress[idx];
 
             const updatedProgress = { ...activeChallenge.dailyProgress, [diff]: newDayProgress };
-            const allTasksCompleted = newDayProgress.length === activeChallenge.dailyRoutine.length && newDayProgress.every(done => done);
+
+            // Check completion ONLY for tasks visible on this day
+            const allTasksCompleted = activeChallenge.dailyRoutine.every((task, i) => {
+                const addedOn = task.addedOnDay || 1;
+                const removedOn = task.removedOnDay || Infinity;
+                const isVisible = diff >= addedOn && diff < removedOn;
+
+                if (!isVisible) return true; // Skipped tasks count as 'done' for the sake of the day's victory
+                return newDayProgress[i];
+            });
 
             let newCompletedDays = activeChallenge.completedDays;
             if (allTasksCompleted) {
@@ -261,18 +277,25 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
         const regularTasksForDay = safeTasks.filter(t => t.scheduledDate === dayDateStr);
 
-        const protocolTasks = isProtocolDay ? activeChallenge!.dailyRoutine.map((item, idx) => {
-            const override = activeChallenge!.dailyOverrides?.[diff]?.[idx];
-            return {
-                id: `protocol-${idx}`,
-                text: override?.text || item.text,
-                completed: activeChallenge!.dailyProgress[diff]?.[idx] || false,
-                scheduledDate: dayDateStr,
-                scheduledTime: override?.time || item.time,
-                isProtocol: true,
-                protocolIdx: idx
-            } as Task;
-        }) : [];
+        const protocolTasks = isProtocolDay ? activeChallenge!.dailyRoutine
+            .map((item, idx) => ({ item, idx })) // Map to preserve original index
+            .filter(({ item }) => {
+                const addedOn = item.addedOnDay || 1;
+                const removedOn = item.removedOnDay || Infinity;
+                return diff >= addedOn && diff < removedOn;
+            })
+            .map(({ item, idx }) => {
+                const override = activeChallenge!.dailyOverrides?.[diff]?.[idx];
+                return {
+                    id: `protocol-${idx}`,
+                    text: override?.text || item.text,
+                    completed: activeChallenge!.dailyProgress[diff]?.[idx] || false,
+                    scheduledDate: dayDateStr,
+                    scheduledTime: override?.time || item.time,
+                    isProtocol: true,
+                    protocolIdx: idx
+                } as Task;
+            }) : [];
 
         // Return incomplete tasks preferably, or all? Usually import implies "to do".
         // But the previous import logic filtered out completed? No, PomodoroView filters filtering importCandidates?

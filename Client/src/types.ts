@@ -26,6 +26,8 @@ export interface Challenge {
         id: string;
         text: string;
         time?: string;
+        addedOnDay?: number;
+        removedOnDay?: number;
     }[];
     days: number;
     startDate: string;
