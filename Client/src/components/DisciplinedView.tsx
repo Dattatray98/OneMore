@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Target, Trophy, CheckCircle2, Clock, Settings, Save, Zap, Calendar, TrendingUp, BarChart3, Plus, Edit2, Trash2 } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import type { Challenge } from '../types';
+import { generateId } from '../utils/id';
 
 interface DisciplinedViewProps {
     challenge: Challenge | null;
@@ -63,7 +64,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
         if (days < 1) return;
 
         const newChallenge: Challenge = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             title: title || 'New Discipline Challenge',
             description,
             dailyRoutine,
@@ -91,7 +92,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
     const addRoutineTask = () => {
         if (!newTask.trim()) return;
         setDailyRoutine([...dailyRoutine, {
-            id: crypto.randomUUID(),
+            id: generateId(),
             text: newTask.trim(),
             time: newTaskTime || undefined
         }]);
@@ -208,7 +209,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
         }
 
         const newHistory: any = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             type: 'edit',
             taskId: 'challenge-settings',
             taskText: challenge.title,
@@ -662,7 +663,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                                 onClick={() => {
                                                     if (!editNewTask.trim()) return;
                                                     const newTaskObj = {
-                                                        id: crypto.randomUUID(),
+                                                        id: generateId(),
                                                         text: editNewTask.trim(),
                                                         time: editNewTaskTime || undefined,
                                                         addedOnDay: todayIndex // Effective from today!
@@ -673,7 +674,7 @@ export const DisciplinedView: React.FC<DisciplinedViewProps> = ({ challenge, onU
                                                         ...challenge,
                                                         dailyRoutine: [...challenge.dailyRoutine, newTaskObj],
                                                         history: [{
-                                                            id: crypto.randomUUID(),
+                                                            id: generateId(),
                                                             type: 'add',
                                                             taskId: newTaskObj.id,
                                                             taskText: newTaskObj.text,

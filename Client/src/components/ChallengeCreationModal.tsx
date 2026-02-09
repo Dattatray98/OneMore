@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Target, Plus, X } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Challenge } from '../types';
+import { generateId } from '../utils/id';
 
 interface ChallengeCreationModalProps {
     isOpen: boolean;
@@ -23,7 +24,7 @@ export const ChallengeCreationModal: React.FC<ChallengeCreationModalProps> = ({ 
     const addRoutineTask = () => {
         if (!newTask.trim()) return;
         setDailyRoutine([...dailyRoutine, {
-            id: crypto.randomUUID(),
+            id: generateId(),
             text: newTask.trim(),
             time: newTaskTime || undefined
         }]);
@@ -41,7 +42,7 @@ export const ChallengeCreationModal: React.FC<ChallengeCreationModalProps> = ({ 
         if (days < 1) return;
 
         const newChallenge: Challenge = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             title: title || 'New Discipline Challenge',
             description,
             dailyRoutine,

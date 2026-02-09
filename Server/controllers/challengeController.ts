@@ -14,13 +14,10 @@ export const getChallenges = async (req: any, res: Response) => {
 export const createChallenge = async (req: any, res: Response) => {
     try {
         const userId = req.auth?.userId;
-        console.log('Creating challenge for user:', userId, 'Data:', req.body);
         const c = new Challenge({ ...req.body, userId });
         await c.save();
-        console.log('Challenge saved successfully:', c._id);
         res.status(201).json(c);
     } catch (error) {
-        console.error('Error saving challenge:', error);
         res.status(500).json({ error: 'Failed to save challenge' });
     }
 };

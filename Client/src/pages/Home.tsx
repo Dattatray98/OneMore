@@ -15,6 +15,7 @@ import { DisciplinedView } from '../components/DisciplinedView';
 import { PomodoroView } from '../components/PomodoroView';
 import type { Challenge } from '../types';
 import { SettingsView } from '../components/SettingsView';
+import { generateId } from '../utils/id';
 
 interface HomeProps {
     theme: 'dark' | 'light' | 'system';
@@ -116,7 +117,7 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
 
     const addTask = async (taskOrText: string | Partial<Task>) => {
         const newTask: Task = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             text: typeof taskOrText === 'string' ? taskOrText : taskOrText.text || '',
             completed: false,
             createdAt: Date.now(),
@@ -162,7 +163,7 @@ export const Home: React.FC<HomeProps> = ({ theme, setTheme }) => {
             />
 
             {/* Main Content */}
-            <main className="flex-1 ml-0 md:ml-64 p-4 md:p-8 pb-32 md:pb-8 relative overflow-hidden">
+            <main className="flex-1 ml-0 md:ml-64 p-4 md:p-8 pb-32 md:pb-8 relative overflow-y-auto overflow-x-hidden">
                 {/* Background Ambience (Specific to Home) */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                     <div className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-600/10 dark:bg-purple-600/10 rounded-full blur-[100px] opacity-100 dark:opacity-100" />

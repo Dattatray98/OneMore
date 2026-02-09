@@ -35,15 +35,6 @@ export const useChallenges = () => {
         try {
             // Optimistic update
             setChallenges(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
-            // Type casting because api expects full Challenge (mostly) or we need to ensure types match. 
-            // In a real app, API should accept Partial<Challenge> or we fetch fresh. 
-            // The current api signature says 'challenge: Challenge'. 
-            // Let's assume for now we have the full object or backend handles partials loosely via PUT/PATCH logic in practice, 
-            // OR we fix the api signature later. 
-            // For safety here, we'll assume updates contains the full object as required by the current frontend logic usually.
-
-            // Correction: The api.updateChallenge takes (id, Challenge). 
-            // So we need the full object.
 
             const existing = challenges.find(c => c.id === id);
             if (!existing) return;

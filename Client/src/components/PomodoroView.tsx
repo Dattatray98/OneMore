@@ -3,6 +3,7 @@ import { Play, Pause, RotateCcw, Target, CheckCircle2, ListTodo, ChevronUp, Chev
 import { api } from '../api';
 import type { Task, Challenge } from '../types';
 import { differenceInDays, parseISO, format, subDays } from 'date-fns';
+import { generateId } from '../utils/id';
 
 const FocusAnalyzer = ({ dailyStats, onClear, history, sessionCount }: { dailyStats: { workSecs: number, breakSecs: number }, onClear: () => void, history: any[], sessionCount?: number }) => {
     const today = new Date();
@@ -583,7 +584,7 @@ export const PomodoroView: React.FC<PomodoroViewProps> = ({ tasks, activeChallen
         if (!newTaskText.trim()) return;
 
         const newTask: Task = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             text: newTaskText,
             completed: false,
             createdAt: Date.now(),

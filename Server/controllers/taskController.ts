@@ -14,13 +14,10 @@ export const getTasks = async (req: any, res: Response) => {
 export const createTask = async (req: any, res: Response) => {
     try {
         const userId = req.auth?.userId;
-        console.log('Creating task for user:', userId, 'Data:', req.body);
         const task = new Task({ ...req.body, userId });
         await task.save();
-        console.log('Task saved successfully:', task._id);
         res.status(201).json(task);
     } catch (error) {
-        console.error('Error saving task:', error);
         res.status(500).json({ error: 'Failed to save task' });
     }
 };

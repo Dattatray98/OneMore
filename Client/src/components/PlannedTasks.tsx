@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon, ChevronRight, Plus, Check, Target, Trash2, Ed
 import { format, isSameDay, differenceInDays, parseISO } from 'date-fns';
 import { TaskModal } from './TaskModal';
 import { ChallengeCreationModal } from './ChallengeCreationModal';
+import { generateId } from '../utils/id';
 
 interface PlannedTasksProps {
     tasks: Task[];
@@ -128,7 +129,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                 };
 
                 const newHistory: HistoryRecord = {
-                    id: crypto.randomUUID(),
+                    id: generateId(),
                     type: 'edit',
                     taskId: taskData.id,
                     taskText: newText,
@@ -146,7 +147,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
             } else {
                 const diff = differenceInDays(selectedDate, parseISO(activeChallenge.startDate)) + 1;
                 const newRoutineItem = {
-                    id: crypto.randomUUID(),
+                    id: generateId(),
                     text: taskData.text || 'Untitled Protocol',
                     time: taskData.scheduledTime,
                     addedOnDay: Math.max(1, diff)
@@ -157,7 +158,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
 
                 const newHistory: HistoryRecord = {
-                    id: crypto.randomUUID(),
+                    id: generateId(),
                     type: 'add',
                     taskId: newRoutineItem.id,
                     taskText: newRoutineItem.text,
@@ -248,7 +249,7 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
 
             const taskToDelete = activeChallenge.dailyRoutine[idx];
             const newHistory: HistoryRecord = {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'delete',
                 taskId: id,
                 taskText: taskToDelete.text,
@@ -534,8 +535,12 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                             <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">{taskTypeFilter === 'normal' ? 'Manual Schedule' : activeChallenge?.title}</span>
                                         </div>
                                         <button
-                                            onClick={() => handleAddTask(format(selectedDate, 'yyyy-MM-dd'))}
-                                            className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/20 font-medium text-xs md:text-sm cursor-pointer"
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddTask(format(selectedDate, 'yyyy-MM-dd'));
+                                            }}
+                                            className="relative z-10 flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-all shadow-lg shadow-cyan-500/20 font-medium text-xs md:text-sm cursor-pointer active:scale-95"
                                         >
                                             <Plus size={14} className="md:w-4 md:h-4" />
                                             Add Task
@@ -577,8 +582,12 @@ export const PlannedTasks: React.FC<PlannedTasksProps> = ({
                                                         </div>
                                                         <p className="text-slate-500 font-medium">No tasks for this day</p>
                                                         <button
-                                                            onClick={() => handleAddTask(format(selectedDate, 'yyyy-MM-dd'))}
-                                                            className="mt-4 text-cyan-600 dark:text-cyan-400 text-sm hover:underline cursor-pointer font-bold"
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleAddTask(format(selectedDate, 'yyyy-MM-dd'));
+                                                            }}
+                                                            className="relative z-10 mt-4 text-cyan-600 dark:text-cyan-400 text-sm hover:underline cursor-pointer font-bold p-2"
                                                         >
                                                             Schedule a task
                                                         </button>

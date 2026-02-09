@@ -2,7 +2,6 @@ import axios from 'axios';
 import type { Task, Challenge } from './types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
-console.log('configured API_URL:', API_URL);
 
 let authToken: string | null = null;
 
