@@ -1,53 +1,48 @@
-import { useState, useCallback } from 'react';
-import { api } from '../api';
-import type { Task } from '../types';
+import { useCallback, useState } from 'react';
+import { useTaskStore } from '../store/useTaskStore';
+import { taskApi } from '../api/index';
+import type { Task } from '../types/index';
 
 export const useTasks = () => {
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const { tasks, setTasks } = useTaskStore();
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error] = useState<string | null>(null);
 
     const fetchTasks = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await api.getTasks();
+            const data = await taskApi.getTasks();
             setTasks(Array.isArray(data) ? data : []);
-            setError(null);
         } catch (err: any) {
-            setError(err.message || 'Failed to fetch tasks');
+            console.error(err);
         } finally {
-            setLoading(false);
         }
     }, []);
 
     const addTask = useCallback(async (task: Task) => {
         try {
-            const newTask = await api.addTask(task);
-            setTasks(prev => [newTask, ...prev]);
+            const newTask = await taskApi.addTask(task);
+            setTasks([newTask, ...tasks]);
             return newTask;
         } catch (err: any) {
-            setError(err.message || 'Failed to add task');
             throw err;
         }
     }, []);
 
     const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
         try {
-            setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
-            await api.updateTask(id, updates);
+            setTasks(tasks.map(t => t.id === id ? { ...t, ...updates } : t));
+            await taskApi.updateTask(id, updates);
         } catch (err: any) {
-            setError(err.message || 'Failed to update task');
-            // Revert optimistic update? For now, we assume simple error handling.
             fetchTasks();
         }
     }, [fetchTasks]);
 
     const deleteTask = useCallback(async (id: string) => {
         try {
-            setTasks(prev => prev.filter(t => t.id !== id));
-            await api.deleteTask(id);
+            setTasks(tasks.filter(t => t.id !== id));
+            await taskApi.deleteTask(id);
         } catch (err: any) {
-            setError(err.message || 'Failed to delete task');
             fetchTasks();
         }
     }, [fetchTasks]);

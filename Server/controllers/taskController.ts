@@ -1,45 +1,41 @@
-import { Response } from 'express';
-import Task from '../models/Task';
+import { NextFunction, Response } from 'express';
+import { TaskService } from '../services/TaskService';
+import { taskSchema, updateTaskSchema } from '../validators/taskValidator';
 
-export const getTasks = async (req: any, res: Response) => {
+export const getTasks = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const tasks = await Task.find({ userId }).sort({ createdAt: -1 });
+        const tasks = await TaskService.getAllTasks(req.auth?.userId);
         res.json(tasks);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch tasks' });
+        next(error);
     }
 };
 
-export const createTask = async (req: any, res: Response) => {
+export const createTask = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const task = new Task({ ...req.body, userId });
-        await task.save();
+        const validatedData = taskSchema.parse(req.body);
+        const task = await TaskService.createTask(req.auth?.userId, validatedData);
         res.status(201).json(task);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save task' });
+    } catch (error: any) {
+        next(error);
     }
 };
 
-export const updateTask = async (req: any, res: Response) => {
+export const updateTask = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const id = req.params.id;
-        const updates = req.body;
-        await Task.findOneAndUpdate({ id, userId }, updates);
+        const validatedData = updateTaskSchema.parse(req.body);
+        await TaskService.updateTask(req.auth?.userId, req.params.id, validatedData);
         res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to update task' });
+    } catch (error: any) {
+        next(error);
     }
 };
 
-export const deleteTask = async (req: any, res: Response) => {
+export const deleteTask = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        await Task.findOneAndDelete({ id: req.params.id, userId });
+        await TaskService.deleteTask(req.auth?.userId, req.params.id);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to delete task' });
+        next(error);
     }
 };

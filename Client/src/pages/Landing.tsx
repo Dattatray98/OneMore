@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
+import { Navbar } from '../components/layout/Navbar';
+import { Footer } from '../components/layout/Footer';
 import { ArrowRight, CheckCircle2, Zap, Shield, Layout } from 'lucide-react';
 
 export const Landing = () => {

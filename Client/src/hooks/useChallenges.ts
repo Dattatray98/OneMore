@@ -1,16 +1,17 @@
 import { useState, useCallback } from 'react';
-import { api } from '../api';
-import type { Challenge } from '../types';
+import { useChallengeStore } from '../store/useChallengeStore';
+import { challengeApi } from '../api/index';
+import type { Challenge } from '../types/index';
 
 export const useChallenges = () => {
-    const [challenges, setChallenges] = useState<Challenge[]>([]);
+    const { challenges, setChallenges } = useChallengeStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchChallenges = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await api.getChallenges();
+            const data = await challengeApi.getChallenges();
             setChallenges(Array.isArray(data) ? data : []);
             setError(null);
         } catch (err: any) {
@@ -22,8 +23,8 @@ export const useChallenges = () => {
 
     const addChallenge = useCallback(async (challenge: Challenge) => {
         try {
-            const newChallenge = await api.addChallenge(challenge);
-            setChallenges(prev => [...prev, newChallenge]);
+            const newChallenge = await challengeApi.addChallenge(challenge);
+            setChallenges([...challenges, newChallenge]);
             return newChallenge;
         } catch (err: any) {
             setError(err.message || 'Failed to add challenge');
@@ -34,13 +35,13 @@ export const useChallenges = () => {
     const updateChallenge = useCallback(async (id: string, updates: Partial<Challenge>) => {
         try {
             // Optimistic update
-            setChallenges(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+            setChallenges(challenges.map(c => c.id === id ? { ...c, ...updates } : c));
 
             const existing = challenges.find(c => c.id === id);
             if (!existing) return;
             const fullUpdated = { ...existing, ...updates };
 
-            await api.updateChallenge(id, fullUpdated);
+            await challengeApi.updateChallenge(id, fullUpdated);
         } catch (err: any) {
             setError(err.message || 'Failed to update challenge');
             fetchChallenges();
@@ -49,8 +50,8 @@ export const useChallenges = () => {
 
     const deleteChallenge = useCallback(async (id: string) => {
         try {
-            setChallenges(prev => prev.filter(c => c.id !== id));
-            await api.deleteChallenge(id);
+            setChallenges(challenges.filter(c => c.id !== id));
+            await challengeApi.deleteChallenge(id);
         } catch (err: any) {
             setError(err.message || 'Failed to delete challenge');
             fetchChallenges();

@@ -1,0 +1,16 @@
+import { apiClient } from './client';
+
+export const notificationApi = {
+    getNotifications: async () => {
+        const res = await apiClient.get('/notifications');
+        return res.data;
+    },
+    markAsRead: async (id: string) => {
+        const res = await apiClient.patch(`/notifications/${id}/read`);
+        return res.data;
+    },
+    markAllAsRead: async () => {
+        const res = await apiClient.post('/notifications/mark-all-read');
+        return res.data;
+    }
+};

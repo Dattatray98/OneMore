@@ -1,49 +1,40 @@
-import { Request, Response } from 'express';
-import PomodoroStats from '../models/PomodoroStats';
+import { NextFunction, Response } from 'express';
+import { PomodoroService } from '../services/PomodoroService';
+import { pomodoroStatsSchema } from '../validators/pomodoroValidator';
 
-export const getPomodoroStatsByDate = async (req: any, res: Response) => {
+export const getPomodoroStatsByDate = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const stats = await PomodoroStats.findOne({ date: req.params.date, userId });
-        if (!stats) return res.json({ workSecs: 0, breakSecs: 0, sessionCount: 0, sequence: [] });
+        const stats = await PomodoroService.getStatsByDate(req.auth?.userId, req.params.date);
         res.json(stats);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch pomodoro stats' });
+        next(error);
     }
 };
 
-export const getAllPomodoroStats = async (req: any, res: Response) => {
+export const getAllPomodoroStats = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const stats = await PomodoroStats.find({ userId });
+        const stats = await PomodoroService.getAllStats(req.auth?.userId);
         res.json(stats);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch all pomodoro stats' });
+        next(error);
     }
 };
 
-export const updatePomodoroStats = async (req: any, res: Response) => {
+export const updatePomodoroStats = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        const date = req.params.date;
-        const data = req.body;
-        await PomodoroStats.findOneAndUpdate(
-            { date, userId },
-            { ...data, date, userId },
-            { upsert: true, new: true }
-        );
+        const validatedData = pomodoroStatsSchema.parse(req.body);
+        await PomodoroService.updateStats(req.auth?.userId, req.params.date, validatedData);
         res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to save pomodoro stats' });
+    } catch (error: any) {
+        next(error);
     }
 };
 
-export const clearPomodoroStats = async (req: any, res: Response) => {
+export const clearPomodoroStats = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const userId = req.auth?.userId;
-        await PomodoroStats.deleteMany({ userId });
+        await PomodoroService.clearAllStats(req.auth?.userId);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to clear pomodoro stats' });
+        next(error);
     }
 };
